@@ -78,7 +78,6 @@ let u_ModelMatrix;
 let g_rLeg=15;
 let g_lLeg=15;
 let wings=10;
-let animate=false;
 let moveUp; 
 let moveBack; 
 let moveBackL; 
@@ -93,20 +92,21 @@ let rotateN=0;
 let moveBottomL;
 let u_Sampler0;
 let u_Sampler1;
-
+let animate=true;
 let u_texColorWeight;
 let a_UV;
 
 
 
 let gAnimalGlobalRotation=120; // was 40
+let gAnimalGlobalRotationy=0;
 function addActionsForUI() { // used this resource "https://www.w3schools.com/howto/howto_js_rangeslider.asp"
- document.getElementById('camera').addEventListener('mousemove', function () {gAnimalGlobalRotation=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
- document.getElementById('rLeg').addEventListener('mousemove', function () {g_rLeg=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
- document.getElementById('lLeg').addEventListener('mousemove', function () {g_lLeg=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
- document.getElementById('wings').addEventListener('mousemove', function () {wings=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
- document.getElementById('on').onclick = function () {animate=true};
- document.getElementById('off').onclick = function () {animate=false};
+ //document.getElementById('camera').addEventListener('mousemove', function () {gAnimalGlobalRotation=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
+ //document.getElementById('rLeg').addEventListener('mousemove', function () {g_rLeg=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
+ //document.getElementById('lLeg').addEventListener('mousemove', function () {g_lLeg=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
+ //document.getElementById('wings').addEventListener('mousemove', function () {wings=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
+ //document.getElementById('on').onclick = function () {animate=true};
+ //document.getElementById('off').onclick = function () {animate=false};
 }
 
 
@@ -188,10 +188,11 @@ function connectVariablesToGLSL() {
 
 function updateAnimationAngles(){
   if(animate==true){
-    g_rLeg=45*Math.sin(g_seconds*6);
+    //g_rLeg=45*Math.sin(g_seconds);
     wings=10*Math.sin(g_seconds*2);
-    g_lLeg=-45*Math.sin(g_seconds*6);
+    //g_lLeg=-45*Math.sin(g_seconds);
   }
+
 }
 
 function renderScene(){
@@ -234,8 +235,8 @@ drawCubeUV(modelMatrix1,uv);
   gl.uniform1i(u_whichTexture,0);
   drawCubeUV(modelMatrix,uv);
 
+  /*
   // cube
-
   modelMatrix=new Matrix4();
   scaleM.setScale(1,1,1);
   modelMatrix.multiply(scaleM);
@@ -256,12 +257,13 @@ drawCubeUV(modelMatrix1,uv);
   rgba=[0,.0,1,1];
   gl.uniform1i(u_whichTexture,-3);
   drawCube(modelMatrix);
+  */
 
   var g_map=[
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
     [1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+    [1,0,2,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
     [1,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
     [1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,1],
@@ -293,9 +295,9 @@ drawCubeUV(modelMatrix1,uv);
   ];
   
   drawMap(g_map);
-    /*var duration = performance.now()-startTime;
+    var duration = performance.now()-startTime;
     sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
-  */
+  
   }
   
 function drawMap(g_map){
@@ -327,6 +329,16 @@ function drawMap(g_map){
           drawCubeUV(body,uv);
         }
       }
+      if(g_map[x][y]==2){
+        Jerry = new Flamingo();
+        Jerry.x= x;
+        Jerry.y=-1
+        Jerry.z= y;
+        //Jerry.rotate(Math.sin(g_seconds/2)*10,0,0,1);
+        let k= new Matrix4(Math.sin(g_seconds/2)*10,0,0,1);
+        Jerry.rotX.set(k);
+        Jerry.render();
+      }
     }
   }
 }
@@ -346,10 +358,8 @@ function renderAllShapes() {
   gl.uniformMatrix4fv(u_ViewMatrix,false,g_camera.viewMatrix.elements);
   gl.uniformMatrix4fv(u_ProjectionMatrix,false,g_camera.projectionMatrix.elements);
 
-  var globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation,0,1,0);
-  //var globalRotMat=new Matrix4().rotate(0,0,0,0);
-  //var globalRotMat=new Matrix4().rotate(30,-1,-4,0);
-
+  let globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation,gAnimalGlobalRotationy,1,0);
+  //globalRotMat.rotate(gAnimalGlobalRotationy,1,0,0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
 
   var xformMatrix = new Matrix4();
@@ -419,7 +429,6 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
   else{
     gl.activeTexture(gl.TEXTURE1);
     g_texUnit_1=true;
-
   }
   
   // Bind the texture object to the target
@@ -444,8 +453,8 @@ var at=new Vector3([0,0,-1.0]);
 var up=new Vector3([0,1,0]);
 var w=new Vector3(0.0,0.0,0.0);
 
-var lastX = -1;
-var lastY = -1;
+let lastX = -1;
+let lastY = -1;
 
 
 function main() {
@@ -455,14 +464,12 @@ function main() {
 
   g_camera=new Camera(canvas.width/canvas.height,.1,1000);
   
-  initTextures(gl,0);
-  //initEventHandlers(currentAngle);
   document.onkeydown=keydown;
   canvas.addEventListener('mousemove', function(ev) {initEventHandlers(ev)});
 
+  initTextures(gl,0);
   renderScene();
 
-  //gl.enable(gl.DEPTH_TEST);
   // Specify the color for clearing <canvas>  
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   // Clear <canvas>
@@ -470,7 +477,7 @@ function main() {
   requestAnimationFrame(tick);
 } 
 
-var currentAngle=[0.0,0.0]; 
+let currentAngle=[0.0,0.0]; 
 var g_startTime=performance.now()/240;
 var g_seconds=performance.now()/240-g_startTime;
 
@@ -519,15 +526,17 @@ function initEventHandlers(ev) {
       var factor = 100/canvas.height;
       var dx = factor * (x - lastX);
       var dy = factor * (y - lastY);
-      if(dx > 0) {
-          g_camera.panLeft();
-      } else if (dx < 0) {
-          g_camera.panRight();
+      if(dx > 0.1) {
+          //g_camera.panLeft();
+      } else if (dx < -0.1) {
+          //g_camera.panRight();
       }
-      if(dy < 0) {
-          g_camera.at.elements[1] += 1;
-      } else if (dy > 0) {
-        g_camera.at.elements[1] -= 1;
+      if(dy < -0.1) {
+          //g_camera.at.elements[1] += 1;
+          g_camera.panUp();
+      } else if (dy > 0.1) {
+          //g_camera.at.elements[1] -= 1;
+          g_camera.panDown();
       }
   }
   lastX = x;

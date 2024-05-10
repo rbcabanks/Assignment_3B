@@ -81,10 +81,28 @@ class Camera {
     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panLeft(){
-    gAnimalGlobalRotation=gAnimalGlobalRotation-2;
+    gAnimalGlobalRotation=gAnimalGlobalRotation-.1;
+    console.log("panLeft");
   }
   panRight(){
-    gAnimalGlobalRotation=gAnimalGlobalRotation+2;
+    gAnimalGlobalRotation=gAnimalGlobalRotation+.1;
+    console.log("panRight");
+  }
+  panUp(){
+    ////gAnimalGlobalRotationy=gAnimalGlobalRotationy+.1;
+    /*var globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation+2,1,0,0);
+    gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
+*/
+    console.log("panUp");
+    this.at.elements[1] += .1;
+  }
+  panDown(){
+    ////gAnimalGlobalRotationy=gAnimalGlobalRotationy-.1;
+    /*var globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation-2,1,0,0);
+    gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
+    */
+    console.log("panDown");
+    this.at.elements[1] -= .1;
   }
   
     
