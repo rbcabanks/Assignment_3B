@@ -95,6 +95,9 @@ class Camera {
 */
     console.log("panUp");
     this.at.elements[1] += .1;
+    
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panDown(){
     ////gAnimalGlobalRotationy=gAnimalGlobalRotationy-.1;
@@ -103,6 +106,10 @@ class Camera {
     */
     console.log("panDown");
     this.at.elements[1] -= .1;
+
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
+    
   }
   
     
