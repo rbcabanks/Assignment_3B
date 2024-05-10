@@ -456,7 +456,9 @@ function main() {
   g_camera=new Camera(canvas.width/canvas.height,.1,1000);
   
   initTextures(gl,0);
-  initEventHandlers(currentAngle);
+  //initEventHandlers(currentAngle);
+  document.onkeydown=keydown;
+  canvas.addEventListener('mousemove', function(ev) {initEventHandlers(ev)});
 
   renderScene();
 
@@ -506,76 +508,35 @@ var g_MvpMatrix = new Matrix4(); // Model view projection matrix
 ////var lastX = -1;
 ////var lastY = -1;
 var globalRotMat1=new Matrix4();
-function initEventHandlers(currentAngle) {
-  var dragging = false;         // Dragging or not
+var dragging = false;         // Dragging or not
      // Last position of the mouse
-
-  canvas.onmousedown = function(ev) {   // Mouse is pressed
-    var x = ev.clientX, y = ev.clientY;
-    // Start dragging if a moue is in <canvas>
-    //dragging = true;
-    //lastX = x; lastY = y;
-    var rect = ev.target.getBoundingClientRect();
-    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-      lastX = x; lastY = y;
-      console.log("last ",x,y);
-    
-      dragging = true;
-    }
-  };
-
-  canvas.onmouseup = function(ev) { 
-    console.log("end dragging")
-    var x = ev.clientX, y = ev.clientY;
-    console.log("dragging?",dragging);
-
-    var factor = 100/canvas.height; // The rotation ratio
-    console.log("move last ",lastX,x);
-    var dx = factor * (x - lastX);
-    var dy = factor * (y - lastY);
-    // Limit x-axis rotation angle to -90 to 90 degrees
-    currentAngle[0] = Math.max(Math.min(currentAngle[0] + dy, 90.0), -90.0);
-    currentAngle[1] = currentAngle[1] + dx;
-    console.log("drag from", lastX, x);
-    console.log("currentAngle[0]",currentAngle[0]);
-    console.log("currentAngle[1]",currentAngle[1]);
-    
-    lastX = x, lastY = y;
-    globalRotMat1.rotate(currentAngle[0],1,0,0);
-    globalRotMat1.rotate(currentAngle[1],0,1,0);
-    gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat1.elements);
-    
-    //renderScene();
-    //requestAnimationFrame(tick);
-    //dragging = false;  
   
-  }; // Mouse is released
 
-
-  /*canvas.onmousemove = function(ev) { // Mouse is moved
-    var x = ev.clientX, y = ev.clientY;
-    console.log("dragging?",dragging);
-    if (dragging) {
-      var factor = 100/canvas.height; // The rotation ratio
-      console.log("move last ",lastX,x);
+function initEventHandlers(ev) {
+  var x = ev.clientX;
+  var y = ev.clientY;
+  if(ev.buttons == 1) {
+      var factor = 100/canvas.height;
       var dx = factor * (x - lastX);
       var dy = factor * (y - lastY);
-      // Limit x-axis rotation angle to -90 to 90 degrees
-      currentAngle[0] = Math.max(Math.min(currentAngle[0] + dy, 90.0), -90.0);
-      currentAngle[1] = currentAngle[1] + dx;
-      console.log("drag from", lastX, x);
-      console.log("currentAngle",currentAngle[0]);
-    }
-    lastX = x, lastY = y;
-  };*/
+      if(dx > 0) {
+          g_camera.panLeft();
+      } else if (dx < 0) {
+          g_camera.panRight();
+      }
+      if(dy < 0) {
+          g_camera.at.elements[1] += 1;
+      } else if (dy > 0) {
+        g_camera.at.elements[1] -= 1;
+      }
+  }
+  lastX = x;
+  lastY = y;
 }
-
 
 function tick(){
   g_seconds=performance.now()/240-g_startTime;
   updateAnimationAngles();
-  document.onkeydown=keydown;
-  initEventHandlers(currentAngle);
   renderScene();
   requestAnimationFrame(tick);
 }
