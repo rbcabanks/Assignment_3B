@@ -22,7 +22,7 @@ class Camera {
 
   }
   moveForward(){
-    var w = new Vector3;
+    var w = new Vector3(0.0,0.0,0.0);
     console.log("w ",w);
    
     console.log("at ",this.at);
@@ -41,6 +41,9 @@ class Camera {
     console.log("at add",this.at);
     console.log("f ",w);
     
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
+
   }
   moveBackward(){
     var w = new Vector3(0.0,0.0,0.0);
@@ -50,6 +53,8 @@ class Camera {
     w.mul(.05);
     this.at.add(w);
     this.eye.add(w);
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   moveLeft(){
     var w = new Vector3(0.0,0.0,0.0);
@@ -60,6 +65,8 @@ class Camera {
     var s = Vector3.cross(this.up, w);
     this.at.add(s);
     this.eye.add(s);
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
  }
   moveRight(){
     var r = new Vector3(0.0,0.0,0.0);  
@@ -69,13 +76,15 @@ class Camera {
     r.mul(.05);
     var s = Vector3.cross(this.up, r);
     this.at.add(s);
-    this.eye.add(s)
+    this.eye.add(s);
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panLeft(){
-  
+    gAnimalGlobalRotation=gAnimalGlobalRotation-2;
   }
   panRight(){
-
+    gAnimalGlobalRotation=gAnimalGlobalRotation+2;
   }
   
     
