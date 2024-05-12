@@ -8,18 +8,21 @@ class Camera {
 
     //this.updateView();
     this.projectionMatrix=new Matrix4();
-    this.projectionMatrix.setPerspective(this.fov,aspectRatio,near,far);
+    this.resetPerspective(aspectRatio,near,far);
     //this.projectionMatrix.setPerspective(174,1,.1,1000);
     
-    gl.uniformMatrix4fv(u_ProjectionMatrix,false,this.projectionMatrix.elements);
 
     this.viewMatrix=new Matrix4();
-    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
+    this.setLook();
     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
 
-   //gl.uniformMatrix4fv(u_ProjectionMatrix,false,this.projectionMatrix.elements);
-    gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
 
+  }
+  resetPerspective(aspectRatio,near,far){
+    this.projectionMatrix.setPerspective(this.fov,aspectRatio,near,far);
+  }
+  setLook(){
+    this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
   }
   moveForward(){
     var w = new Vector3(0.0,0.0,0.0);

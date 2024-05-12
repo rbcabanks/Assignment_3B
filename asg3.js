@@ -54,6 +54,7 @@ var FSHADER_SOURCE = `
 const POINT = 0;
 const TRIANGLE = 1;
 const CIRCLE = 2;
+let totalPoints=0;
 let canvas;
 let display2;
 let gl;
@@ -107,6 +108,7 @@ function addActionsForUI() { // used this resource "https://www.w3schools.com/ho
  //document.getElementById('wings').addEventListener('mousemove', function () {wings=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
  //document.getElementById('on').onclick = function () {animate=true};
  //document.getElementById('off').onclick = function () {animate=false};
+ sendTextToHTML(totalPoints, "points")
 }
 
 
@@ -121,6 +123,8 @@ function setupWebGL() {
   }
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  g_camera=new Camera(canvas.width/canvas.height,.1,1000);
+
 }
 
 function connectVariablesToGLSL() {
@@ -183,6 +187,9 @@ function connectVariablesToGLSL() {
     console.log('Failed to get the storage location of u_ProjectionMatrix');
     return;
   }
+  gl.uniformMatrix4fv(u_ModelMatrix, false, new Matrix4().elements);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, new Matrix4().elements);
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, new Matrix4().elements);
   
 }
 
@@ -264,34 +271,34 @@ drawCubeUV(modelMatrix1,uv);
     [1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
     [1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
     [1,0,2,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,2,0,0,0,0,1,0,0,1],
     [1,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
     [1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,1],
     [1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
     [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,1,1,1,1,1,1,1],
     [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,0,0,0,0,0,0,0,2,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,2,0,0,1],
     [1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,1,1,1,1,1,1,1],
+    [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,1,1,1,1,1,1,1],
     [1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,2,0,0,1],
     [1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
     [1,0,0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,1,0,0,0,1,0,0,0,1,1,1,0,0,0,1],
     [1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,2,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,2,0,1,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,0,1,0,0,0,0,0,1],
     [1,0,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,1,0,0,0,1,1,1,0,0,0,1],
     [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
-    [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1],
-    [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+    [1,0,0,0,0,1,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1],
+    [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,2,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3],
   ];
   
   drawMap(g_map);
@@ -299,7 +306,7 @@ drawCubeUV(modelMatrix1,uv);
     sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
   
   }
-  
+let Jerries=[]
 function drawMap(g_map){
   for (x=0;x<32;x++){
     for(y=0;y<32;y++){
@@ -310,7 +317,7 @@ function drawMap(g_map){
         scaleM.setScale(.5,2,.5);
         body.multiply(scaleM);
 
-        if((x==0 && y==0)||(x==0 && y==1)||(x==0 && y==2)){
+        if((x==0 && y==0)||(x==0 && y==1)||(x==0 && y==2)||(x==32 && y==30)||(x==32 && y==30)||(x==32 && y==30)){
           rgba=[1,.0,0,1];
           gl.uniform1i(u_whichTexture,-2);
           drawCube(body);
@@ -329,6 +336,7 @@ function drawMap(g_map){
           drawCubeUV(body,uv);
         }
       }
+  
       if(g_map[x][y]==2){
         Jerry = new Flamingo();
         Jerry.x= x;
@@ -337,24 +345,19 @@ function drawMap(g_map){
         //Jerry.rotate(Math.sin(g_seconds/2)*10,0,0,1);
         let k= new Matrix4(Math.sin(g_seconds/2)*10,0,0,1);
         Jerry.rotX.set(k);
-        Jerry.render();
+        Jerries.push(Jerry);
+      }
+
+      for(let flamingo of Jerries) {
+        if(flamingo) {
+          flamingo.render();
+        }
       }
     }
   }
 }
 
 function renderAllShapes() {
-  //var startTime = performance.now();
-  /*var projectionMatrix=new Matrix4();
-  projectionMatrix.setPerspective(60,canvas.width/canvas.height,.1,1000);
-  gl.uniformMatrix4fv(u_ProjectionMatrix,false,projectionMatrix.elements);
-
-  var viewMatrix=new Matrix4();
-  viewMatrix.setLookAt(eye.elements[0],eye.elements[1],eye.elements[2],at.elements[0],at.elements[1],at.elements[2],up.elements[0],up.elements[1],up.elements[2]); //eye, at, up
-  gl.uniformMatrix4fv(u_ViewMatrix,false,viewMatrix.elements);
-  //console.log("render ",viewMatrix.elements);
-*/
-
   gl.uniformMatrix4fv(u_ViewMatrix,false,g_camera.viewMatrix.elements);
   gl.uniformMatrix4fv(u_ProjectionMatrix,false,g_camera.projectionMatrix.elements);
 
@@ -448,11 +451,11 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, n); // Draw the rectangle
 
 }
-var eye=new Vector3([0,0,1.4]);
+/*var eye=new Vector3([0,0,1.4]);
 var at=new Vector3([0,0,-1.0]);
 var up=new Vector3([0,1,0]);
 var w=new Vector3(0.0,0.0,0.0);
-
+*/
 let lastX = -1;
 let lastY = -1;
 
@@ -461,8 +464,6 @@ function main() {
   setupWebGL();
   connectVariablesToGLSL();
   addActionsForUI();
-
-  g_camera=new Camera(canvas.width/canvas.height,.1,1000);
   
   document.onkeydown=keydown;
   canvas.addEventListener('mousemove', function(ev) {initEventHandlers(ev)});
@@ -508,6 +509,31 @@ function keydown(ev) {
   else if (ev.keyCode == 69) { // The e key was pressed
     g_camera.panRight();
   }
+
+
+  var x = ev.clientX;
+  var y = ev.clientY;
+  let JerPos = [];
+  JerPos.push(Math.round(g_camera.at.elements[0]) + 16);
+  JerPos.push(Math.round(g_camera.at.elements[1]) - -1);
+  JerPos.push(Math.round(g_camera.at.elements[2]) + 16);
+/*
+  if(e.button == 2) {
+    // Right click = place block
+    setBlock(blockPos[0], blockPos[1], blockPos[2], TEXTURES.TEXTURE2);
+  } else if(e.button == 0) {
+    // Left click = remove block
+    removeJerry(blockPos[0], blockPos[1], blockPos[2]);
+  }*/
+  if(ev.keyCode==67) { // left click
+    /*this.chunk.deleteBlock(cx, cy, cz);
+    this.chunk.deleteBlock(cx + cx_offset, cy, cz + cz_offset);
+    this.chunk.deleteBlock(cx + cx_offset, cy-1, cz + cz_offset);  */
+    //drawCube(cx + cx_offset, cy, cz + cz_offset, 2);  
+    //removeJerry(blockPos[0], blockPos[1], blockPos[2]);
+    console.log(JerPos[0],JerPos[1],JerPos[2]);
+  }
+
   //initTextures(gl,0);
   renderScene();
 }
@@ -527,20 +553,21 @@ function initEventHandlers(ev) {
       var dx = factor * (x - lastX);
       var dy = factor * (y - lastY);
       if(dx > 0.1) {
-          //g_camera.panLeft();
+          g_camera.panLeft();
       } else if (dx < -0.1) {
-          //g_camera.panRight();
+          g_camera.panRight();
       }
       if(dy < -0.1) {
-          //g_camera.at.elements[1] += 1;
-          g_camera.panUp();
+          g_camera.at.elements[1] += 1;
+          //g_camera.panUp();
       } else if (dy > 0.1) {
-          //g_camera.at.elements[1] -= 1;
-          g_camera.panDown();
+          g_camera.at.elements[1] -= 1;
+          //g_camera.panDown();
       }
   }
   lastX = x;
   lastY = y;
+
 }
 
 function tick(){
