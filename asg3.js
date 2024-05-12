@@ -78,6 +78,7 @@ let refImage=document.getElementById('img2')
 let u_ModelMatrix;
 let g_rLeg=15;
 let g_lLeg=15;
+let float=10;
 let wings=10;
 let moveUp; 
 let moveBack; 
@@ -196,6 +197,7 @@ function connectVariablesToGLSL() {
 function updateAnimationAngles(){
   if(animate==true){
     wings=10*Math.sin(g_seconds*2);
+    float=2*Math.sin(g_seconds*2);
   }
 
 }
@@ -233,47 +235,57 @@ var g_map=[
   [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,2,0,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3],*/
   [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,1,1,1,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,2,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,2,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  [1,0,0,1,0,2,0,0,0,0,1,0,2,0,1],
+  [1,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
+  [1,0,0,1,1,1,1,0,0,0,1,0,0,0,1],
+  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+  [1,0,2,0,0,0,1,1,1,1,1,0,0,0,1],
+  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,2,0,0,0,2,0,1],
+  [1,0,0,1,0,0,1,0,0,0,0,0,0,0,1],
+  [1,1,1,1,0,0,1,0,1,0,0,0,2,0,1],
+  [1,0,2,1,0,0,1,1,1,1,1,0,0,0,1],
+  [1,0,0,1,0,0,1,0,0,0,1,0,0,0,1],
+  [1,2,0,0,0,0,0,0,2,0,1,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,0,2,0,1]
 ];
+let len=0;
 let floatingCubes=[]
 function drawMap(g_map){
   for(x=0;x<15;x++){
     for(y=0;y<15;y++){
+      //console.log(x,y);
       if(g_map[x][y]==1){
         var body = new Matrix4();
         body.setTranslate(x+3,-.75-3,y-1.5);
         var scaleM=new Matrix4();
-        scaleM.setScale(.5,2,.5);
+        scaleM.setScale(.5,8,.5);
         body.multiply(scaleM);
         let uv=[
-          0,0, 0,.5, .5,.5,
-          0,0,.5,.5, 1,0,
+          0,0, 0,2, 2,.3,
+          0,0, 2,1, 1,0,
         ]
         gl.uniform1i(u_whichTexture,-1);
         drawCubeUV(body,uv);
-        
       }
+
       if(g_map[x][y]==2){
         var floatingcube = new Matrix4();
         //scaleMf.setScale(1,1,1);
         //body.multiply(scaleMf);
         //translateM.setTranslate(x+3,.75,y-1.5);
-        floatingcube.setScale(.2,.2,.2)
-        floatingcube.setTranslate(x+3,0,y-1.5);
+        var translaM=new Matrix4();
+        translaM.setTranslate(x+3,0+(float/20),y-1.5);
+        floatingcube.multiply(translaM);
+
+        var scalM=new Matrix4();
+        scalM.setScale(.5,.5,.5);
+        floatingcube.multiply(scalM);
         floatingCubes.push(floatingcube);
+        rgba=[0.0,0.2,0.5,1.0];
+        gl.uniform1i(u_whichTexture,-3);
+        drawCube(floatingcube);
       }
       if(g_map[x][y]==3){
         var body = new Matrix4();
@@ -284,11 +296,11 @@ function drawMap(g_map){
         rgba=[1,.0,0,1];
         gl.uniform1i(u_whichTexture,-2);
         drawCube(body);
-
       }
     }
   }
 } 
+
 function renderScene(){
 
   let translateAll=0;
@@ -305,20 +317,20 @@ function renderScene(){
 
 //floor
 
-let uv=[
-  0,0,0,1,1,1,
-  0,0,1,1,1,0,
-]
+  let uv=[
+    0,0,0,1,1,1,
+    0,0,1,1,1,0,
+  ]
 
-let modelMatrix1=new Matrix4();
-scaleM.setScale(32,.1,32);
-modelMatrix1.multiply(scaleM);
-translateM.setTranslate(0,-20,0);
-modelMatrix1.multiply(translateM);
-rgba=[0.0,0.2,0.5,1.0];
-gl.uniform1i(u_whichTexture,-3);
-//gl.activeTexture(gl.TEXTURE1);
-drawCubeUV(modelMatrix1,uv);
+  let modelMatrix1=new Matrix4();
+  scaleM.setScale(32,.1,32);
+  modelMatrix1.multiply(scaleM);
+  translateM.setTranslate(0,-20,0);
+  modelMatrix1.multiply(translateM);
+  rgba=[0.0,0.2,0.5,1.0];
+  gl.uniform1i(u_whichTexture,-3);
+  //gl.activeTexture(gl.TEXTURE1);
+  drawCubeUV(modelMatrix1,uv);
 
 //sky
   modelMatrix=new Matrix4();
@@ -329,55 +341,11 @@ drawCubeUV(modelMatrix1,uv);
   gl.uniform1i(u_whichTexture,0);
   drawCubeUV(modelMatrix,uv);
 
-  // cube
-  /*modelMatrix=new Matrix4();
-  scaleM.setScale(1,1,1);
-  modelMatrix.multiply(scaleM);
-  translateM.setTranslate(7,0+wings/100,0);
-  modelMatrix.multiply(translateM);
-  rgba=[0,.0,1,1];
-  gl.uniform1i(u_whichTexture,-2);
-  drawCube(modelMatrix);*/
-  /*
-  // cube
-  modelMatrix=new Matrix4();
-  scaleM.setScale(1,1,1);
-  modelMatrix.multiply(scaleM);
-  translateM.setTranslate(0,0,-8);
-  modelMatrix.multiply(translateM);
-
-  rgba=[0,.0,1,1];
-  gl.uniform1i(u_whichTexture,-2);
-  drawCube(modelMatrix);
-
-  // floating cube
-  modelMatrix=new Matrix4();
-  scaleM.setScale(.3,.3,.3);
-  modelMatrix.multiply(scaleM);
-  translateM.setTranslate(6,0,3);
-  modelMatrix.multiply(translateM);
-
-  rgba=[0,.0,1,1];
-  gl.uniform1i(u_whichTexture,-3);
-  drawCube(modelMatrix);
-  */
-  
   drawMap(g_map);
-  console.log("floatingCubes.length ",floatingCubes.length);
-  for(let cube=0;cube<floatingCubes.length;cube++) {
-    //console.log(floatingCubes[cube]);
-    rgba=[0,.0,1,1];
-    let translateMatrix= new Matrix4();
-    translateMatrix.setTranslate(3,0,0);
-    floatingCubes[cube].multiply(translateMatrix);
-    gl.uniform1i(u_whichTexture,-3);
-    drawCube(floatingCubes[cube]);
-  }
 
-    var duration = performance.now()-startTime;
-    sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
-  
-  }
+  var duration = performance.now()-startTime;
+  sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
+}
 
 
 function renderAllShapes() {
@@ -481,7 +449,6 @@ var w=new Vector3(0.0,0.0,0.0);
 */
 let lastX = -1;
 let lastY = -1;
-
 
 function main() {
   setupWebGL();
