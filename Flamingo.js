@@ -13,17 +13,18 @@ class Flamingo {
         let rotateM= new Matrix4();
         let scaleM= new Matrix4();
         let modelMatrix = new Matrix4();
-
+        let moveMatrix = new Matrix4();
+        moveMatrix.setTranslate(this.x,this.y,this.z);
         let uv=[
         0,0,0,1,1,1,
         0,0,1,1,1,0,
         ]
 /*
-        translateM.setTranslate(0+this.x,-1.8+this.y,0+this.z);
+        translateM.setTranslate(0+this.x,-1.8,0+this.z);
         modelMatrix.multiply(translateM);
         scaleM.setScale(30,1,32);
         modelMatrix.multiply(scaleM);
-        translateM.setTranslate(-.5+this.x,0+this.y,-.5+this.z);
+        translateM.setTranslate(-.5+this.x,0,-.5);
         modelMatrix.multiply(translateM);
         rgba=[.1,.1,.7,1];
         //let modelMatrix=new Matrix4();
@@ -36,10 +37,12 @@ class Flamingo {
 
         gl.uniform1i(u_whichTexture,-2);
 
-        translateM.setTranslate(0+this.x,.5+this.y,+this.z);
+        translateM.setTranslate(0,.5,0);
         rotateM.setRotate(5,-.1,0,0);
         scaleM.setScale(.13,.1,.15);
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(this.rotX);
         modelMatrix.multiply(scaleM);
@@ -48,10 +51,12 @@ class Flamingo {
 
         drawCube(modelMatrix);
 
-        translateM.setTranslate(-3+this.x,1.3+this.y,-2+this.z);
+        translateM.setTranslate(-4,1.3,-2);
         //rotateM.setRotate(5,-.1,0,0);
         scaleM.setScale(1.1,.2,.2);
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(this.rotX);
         //modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
@@ -62,11 +67,13 @@ class Flamingo {
 
 
         //beak (3)
-        translateM.setTranslate(0+this.x,.48+this.y,-.18+this.z);
+        translateM.setTranslate(0,.48,-.2);
         rotateM.setRotate(-5,.1,0,0);
         scaleM.setScale(.07,.06,.03);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(this.rotX);
         modelMatrix.multiply(scaleM);
@@ -74,33 +81,38 @@ class Flamingo {
         drawCube(modelMatrix);
 
         //beak (white front) (4)
-        translateM.setTranslate(0+this.x,.50+this.y,-.27+this.z);
+        translateM.setTranslate(0,.50,-.27);
         rotateM.setRotate(-5,.1,0,0);
         scaleM.setScale(.07,.02,.07);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.7,.7,.7,1];
         drawCube(modelMatrix);
 
         //beak (black) (5)
-        translateM.setTranslate(0+this.x,.42+this.y,-.3+this.z);
+        translateM.setTranslate(0,.42,-.3);
         rotateM.setRotate(-5,.1,0,0);
         scaleM.setScale(.07,.07,.03);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.02,.02,.02,1];
         drawCube(modelMatrix);
 
         //beak (black) (6)
-        translateM.setTranslate(0+this.x,.40+this.y,-.25+this.z);
+        translateM.setTranslate(0,.40,-.25);
         rotateM.setRotate(-5,.1,0,0);
         scaleM.setScale(.07,.07,.06);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.02,.02,.02,1];
@@ -108,21 +120,25 @@ class Flamingo {
 
 
         //neck (7)
-        translateM.setTranslate(0+this.x,.2+this.y,.025+this.z);
+        translateM.setTranslate(0,.2,.025);
         rotateM.setRotate(10,.1,0,0);
         scaleM.setScale(.07,.27,.07);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.9,.1,.7,1];
         drawCube(modelMatrix);
 
         //body (8)
-        translateM.setTranslate(0+this.x,-.06+this.y,.2+this.z);
+        translateM.setTranslate(0,-.06,.2);
         scaleM.setScale(.165,.18,.26);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         //modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.8,.1,.6,1];
@@ -136,22 +152,26 @@ class Flamingo {
         moveUp=(wings-10)/1200;
         }
         //left wing bottom (9)
-        translateM.setTranslate((-.2-moveUp/2)+this.x,(-.04+moveUp)+this.y,.2+this.z);
+        translateM.setTranslate((-.2-moveUp/2),(-.04+moveUp),.2);
         rotateM.setRotate(5+wings/2,0,0,-.15);
         scaleM.setScale(.02,.16,.26);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.8,.1,.5,1];
         drawCube(modelMatrix);
 
         //right wing bottom (10)
-        translateM.setTranslate((.2+moveUp/2)+this.x,(-.04+moveUp)+this.y,.2+this.z);
+        translateM.setTranslate((.2+moveUp/2),(-.04+moveUp),.2);
         rotateM.setRotate(-(5+wings/2),0,0,-.15);
         scaleM.setScale(.02,.16,.26);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.8,.1,.5,1];
@@ -172,11 +192,13 @@ class Flamingo {
         moveBack=(g_rLeg-15)/500;
         }
 
-        translateM.setTranslate(.055+this.x,-.3+this.y,.25+(moveBack)+this.z);
+        translateM.setTranslate(.055,-.3,.25+(moveBack));
         rotateM.setRotate(g_rLeg,-.5,0,0);
         scaleM.setScale(.03,.17,.03);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.6,.3,.6,1];
@@ -186,11 +208,12 @@ class Flamingo {
         var rLegMatrix=new Matrix4();
         rLegMatrix.set(modelMatrix);
         rLegMatrix.scale(1.6,.28, 1.7);
-        //    lLegMatrix.translate(-3.2+this.x,-2.6+this.y,-2.3+this.z);
+        //    lLegMatrix.translate(-3.2,-2.6,-2.3);
 
-        rLegMatrix.translate(-3+this.x,-2.6+this.y,-2.3+this.z);
+        rLegMatrix.translate(-3,-2.6,-2.3);
         rLegMatrix.rotate(g_rLeg/1.5,.5,0,0);
         rgba=[.8,.1,.6,1];
+        rLegMatrix.multiply(moveMatrix);
         drawCube(rLegMatrix);
 
 
@@ -210,11 +233,13 @@ class Flamingo {
         }
         }
 
-        translateM.setTranslate(.055+this.x,-.6+(checkgr)+this.y,.25+(moveBottom)+this.z);
+        translateM.setTranslate(.055,-.6+(checkgr),.25+(moveBottom));
         rotateM.setRotate(rotateNr,1,0,0);
         rLegMatrix.scale(.8,1, .8);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.6,.3,.6,1];
@@ -223,9 +248,11 @@ class Flamingo {
 
         let footr=new Matrix4();
         footr.set(modelMatrix);
-        footr.translate(0+this.x,-.3+this.y,-.9+this.z);
+        footr.translate(-6,-.7,-11);
+
         footr.scale(1,.1,3.1);
         rgba=[.6,.3,.6,1];
+        footr.multiply(moveMatrix);
         drawCube(footr);
 
         //-------------------------------------------------------------------
@@ -234,11 +261,13 @@ class Flamingo {
         rotateM.setIdentity();
 
         //left leg (14)
-        translateM.setTranslate(-.055+this.x,-.3+this.y,.25+(moveBackL)+this.z);
+        translateM.setTranslate(-.055,-.3,.25+(moveBackL));
         rotateM.setRotate(g_lLeg,-.5,0,0);
         scaleM.setScale(.03,.17,.03);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.6,.3,.6,1];
@@ -249,9 +278,10 @@ class Flamingo {
         var lLegMatrix=new Matrix4();
         lLegMatrix.set(modelMatrix);
         lLegMatrix.scale(1.6,.28, 1.8);
-        lLegMatrix.translate(-3.2+this.x,-2.6+this.y,-2.3+this.z);
+        lLegMatrix.translate(-3.2,-2.6,-2.3);
         lLegMatrix.rotate(g_lLeg/1.5,.5,0,0);
         rgba=[.8,.1,.6,1];
+        lLegMatrix.multiply(moveMatrix);
         drawCube(lLegMatrix);
 
         //left bottom part of leg (16)
@@ -270,11 +300,13 @@ class Flamingo {
         }
         }
 
-        translateM.setTranslate(-.055+this.x,-.6+(checkg)+this.y,.25+(moveBottomL)+this.z);
+        translateM.setTranslate(-.055,-.6+(checkg),.25+(moveBottomL));
         rotateM.setRotate(rotateN,1,0,0);
         scaleM.setScale(.03,.17,.03);
         modelMatrix.setIdentity();
         modelMatrix.multiply(translateM);
+        modelMatrix.multiply(moveMatrix);
+
         modelMatrix.multiply(rotateM);
         modelMatrix.multiply(scaleM);
         rgba=[.6,.3,.6,1];
@@ -282,9 +314,10 @@ class Flamingo {
 
         let footl=new Matrix4();
         footl.set(modelMatrix);
-        footl.translate(0+this.x,-.3+this.y,-.9+this.z);
+        footl.translate(-0,-.7,-11);
         footl.scale(1,.1,3.1);
         rgba=[.6,.3,.6,1];
+        footl.multiply(moveMatrix);
         drawCube(footl);
     }
 }

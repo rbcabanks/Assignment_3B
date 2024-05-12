@@ -1,8 +1,8 @@
 class Camera {
   constructor(aspectRatio,near,far) {
-    this.fov =60.0;
-    this.eye=new Vector3([0,0,1.4]);
-    this.at=new Vector3([0,0,-1.1]);
+    this.fov =80.0;
+    this.eye=new Vector3([0,.1,1]);
+    this.at=new Vector3([0,0,-100]);
     this.up=new Vector3([0,1,0]);
     this.speed = 0.2;
 
@@ -84,11 +84,11 @@ class Camera {
     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panLeft(){
-    gAnimalGlobalRotation=gAnimalGlobalRotation-.1;
+    gAnimalGlobalRotation=gAnimalGlobalRotation-3;
     console.log("panLeft");
   }
   panRight(){
-    gAnimalGlobalRotation=gAnimalGlobalRotation+.1;
+    gAnimalGlobalRotation=gAnimalGlobalRotation+3;
     console.log("panRight");
   }
   panUp(){
@@ -97,10 +97,10 @@ class Camera {
     gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
 */
     console.log("panUp");
-    this.at.elements[1] += .1;
+    this.eye.elements[1] += .10;
     
     this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
-    gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
+    //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panDown(){
     ////gAnimalGlobalRotationy=gAnimalGlobalRotationy-.1;
@@ -108,10 +108,9 @@ class Camera {
     gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
     */
     console.log("panDown");
-    this.at.elements[1] -= .1;
-
+    this.eye.elements[1] -= .10;
     this.viewMatrix.setLookAt(this.eye.elements[0],this.eye.elements[1],this.eye.elements[2],this.at.elements[0],this.at.elements[1],this.at.elements[2],this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
-    gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
+    //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
     
   }
   
