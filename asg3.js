@@ -317,7 +317,7 @@ function drawMap(g_map){
         scaleM.setScale(.5,2,.5);
         body.multiply(scaleM);
 
-        if((x==0 && y==0)||(x==0 && y==1)||(x==0 && y==2)||(x==32 && y==30)||(x==32 && y==30)||(x==32 && y==30)){
+        if((x==0 && y==0)||(x==0 && y==1)||(x==0 && y==2)||(x==32 && y==30)||(x==32 && y==31)||(x==32 && y==32)){
           rgba=[1,.0,0,1];
           gl.uniform1i(u_whichTexture,-2);
           drawCube(body);
@@ -346,12 +346,6 @@ function drawMap(g_map){
         let k= new Matrix4(Math.sin(g_seconds/2)*10,0,0,1);
         Jerry.rotX.set(k);
         Jerries.push(Jerry);
-      }
-
-      for(let flamingo of Jerries) {
-        if(flamingo) {
-          flamingo.render();
-        }
       }
     }
   }
