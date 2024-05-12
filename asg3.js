@@ -109,7 +109,11 @@ function addActionsForUI() { // used this resource "https://www.w3schools.com/ho
  //document.getElementById('wings').addEventListener('mousemove', function () {wings=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
  //document.getElementById('on').onclick = function () {animate=true};
  //document.getElementById('off').onclick = function () {animate=false};
- sendTextToHTML(totalPoints, "points")
+ if(points!=10){
+  sendTextToHTML(totalPoints, "points")}
+  else{
+  sendTextToHTML("You Win!", "points")
+  }
 }
 
 
