@@ -25,31 +25,33 @@ var FSHADER_SOURCE = `
   uniform int u_whichTexture;
   uniform float u_texColorWeight;
   void main() {
-    if(u_whichTexture == -2){
-      gl_FragColor = u_FragColor;
-    }
-    else if(u_whichTexture == -1){
-      gl_FragColor=vec4(v_UV,1,1);
-    }
-    else if(u_whichTexture == 0){
-      float t= u_texColorWeight;
-      vec4 texColor=texture2D(u_Sampler0,v_UV);
-      vec4 baseColor=vec4(0,0,1,1);
-      gl_FragColor = t*baseColor+t*texColor;
-    }
-    else if(u_whichTexture == -3){
-      float t= u_texColorWeight;
-      vec4 texColor=texture2D(u_Sampler1,v_UV);
-      vec4 baseColor=vec4(0,0,.1,1);
-      gl_FragColor = t*baseColor+t*texColor;
-    }
-    else{
-      gl_FragColor=vec4(1,.2,.2,1);
-    }
+    
+      if(u_whichTexture == -2){
+        gl_FragColor = u_FragColor;
+      }
+      else if(u_whichTexture == -1){
+        gl_FragColor=vec4(v_UV,1,1);
+      }
+      else if(u_whichTexture == 0){
+        float t= u_texColorWeight;
+        vec4 texColor=texture2D(u_Sampler0,v_UV);
+        vec4 baseColor=vec4(0,0,1,1);
+        gl_FragColor = t*baseColor+t*texColor;
+      }
+      else if(u_whichTexture == -3){
+        float t= u_texColorWeight;
+        vec4 texColor=texture2D(u_Sampler1,v_UV);
+        vec4 baseColor=vec4(0,0,.1,1);
+        gl_FragColor = t*baseColor+t*texColor;
+      }
+      else{
+        gl_FragColor=vec4(1,.2,.2,1);
+      }
 
   }`; 
   
 // global variables
+const allPoints=[];
 const POINT = 0;
 const TRIANGLE = 1;
 const CIRCLE = 2;
@@ -96,7 +98,7 @@ let u_Sampler1;
 let animate=true;
 let u_texColorWeight;
 let a_UV;
-
+let u_PickedFace=0;
 
 let gAnimalGlobalRotation=90; // was 40
 let gAnimalGlobalRotationy=0;
@@ -107,29 +109,13 @@ function addActionsForUI() { // used this resource "https://www.w3schools.com/ho
  //document.getElementById('wings').addEventListener('mousemove', function () {wings=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
  //document.getElementById('on').onclick = function () {animate=true};
  //document.getElementById('off').onclick = function () {animate=false};
+
  if(points!=10){
-  sendTextToHTML(totalPoints, "points")}
+  sendTextToHTML(allPoints.length, "points")}
   else{
   sendTextToHTML("You Win!", "points")
   }
-
-  document.onclick = (e) => {
-    var blockPos = [];
-    blockPos.push(Math.round(g_camera.at.elements[0]) + 16);
-    blockPos.push(Math.round(g_camera.at.elements[1]) - -20);
-    blockPos.push(Math.round(g_camera.at.elements[2]) + 16);
-
-    console.log(blockPos)
-    for (let x = 0; x<15; x++){
-      for (let y = 0; y<15; y++){
-        //translateK.setTranslate(x+3,-.75-3,y-1.0);
-        if(blockPos[0]==x+3 && blockPos[2]==y-1.0){
-          g_map[x][y]=0;
-      }
-    }
-  }
   
-}
 }
 
 function setupWebGL() {
@@ -182,6 +168,7 @@ function connectVariablesToGLSL() {
     console.log('Failed to get the storage location of u_whichTexture');
     return;
   }
+
   u_Size = gl.getUniformLocation(gl.program, 'u_Size');
   if (!u_Size) {
     console.log('Failed to get the storage location of u_Size');
@@ -243,6 +230,7 @@ let moveX=0
 let moveZ=0
 
 function drawMap(g_map){
+  floatingCubes=[]
   for(x=0;x<15;x++){
     for(y=0;y<15;y++){
       //console.log(x,y);
@@ -271,20 +259,24 @@ function drawMap(g_map){
         //body.multiply(scaleMf);
         //translateM.setTranslate(x+3,.75,y-1.5);
         translaM=new Matrix4();
-        translaM.setTranslate(x+3,0+(float/20),y-1.5);
+        translaM.setTranslate(x+3,0,y-1.5);
         floatingcube.multiply(translaM);
-        //floatingcube.multiply(moveAll);
 
         scalM=new Matrix4();
         scalM.setScale(.5,.5,.5);
         floatingcube.multiply(scalM);
+        if (!floatingCubes.includes(floatingcube)) {
+          floatingCubes.push(floatingcube);
+        }
         //floatingCubes.push(floatingcube);
-        rgba=[0.0,0.2,0.5,1.0];
+        /*rgba=[0.0,0.2,0.5,1.0];
         gl.uniform1i(u_whichTexture,-3);
         drawCube(floatingcube);
+        */
       }
     }
   }
+  //console.log(floatingCubes.length);
 }
 function renderScene(){
 
@@ -302,8 +294,8 @@ function renderScene(){
 //floor
 
   let uv=[
-    0,0,0,1,1,1,
-    0,0,1,1,1,0,
+    0,0,0,.5,1,1,
+    0,0,2,.5,1,0,
   ]
 
   let modelMatrix1=new Matrix4();
@@ -312,12 +304,14 @@ function renderScene(){
   translateM.setTranslate(0,-20,0);
   modelMatrix1.multiply(translateM);
   
-  rgba=[0.0,0.2,0.5,1.0];
+  rgba=[0.0,0.5,0.5,1.0];
   gl.uniform1i(u_whichTexture,-3);
-  //gl.activeTexture(gl.TEXTURE1);
+  gl.activeTexture(gl.TEXTURE1);
   drawCubeUV(modelMatrix1,uv);
+  //drawCube(modelMatrix1);
 
 //sky
+  scaleM=new Matrix4();
   modelMatrix=new Matrix4();
   scaleM.setScale(300,300,300);
   modelMatrix.multiply(scaleM);
@@ -326,8 +320,18 @@ function renderScene(){
   gl.uniform1i(u_whichTexture,0);
   drawCubeUV(modelMatrix,uv);
 
+
   drawMap(g_map)
 
+  for(let x=0;x<floatingCubes.length;x++){
+    translateM=new Matrix4();
+    translateM.setTranslate(0,(float/20),0)
+    floatingCubes[x].multiply(translateM);
+    rgba=[0.0,0.0,0,1];
+    gl.uniform1i(u_whichTexture,-2);
+    drawCube(floatingCubes[x]);
+  }
+  
   var duration = performance.now()-startTime;
   sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
 }
@@ -362,6 +366,35 @@ function sendTextToHTML(text,htmlID){
   htmlElm.innerHTML=text;
 }
 
+function deleteFloatingCube(a,b,c){
+  x=a-3;
+  y=c+1.5;
+  if(g_map[x][y]==2){
+    g_map[x][y]=0;
+  }
+  /*
+  for(x=0;x<15;x++){
+    for(y=0;y<15;y++){
+      if(g_map[x][y]==2){
+        var translaM=new Matrix4();
+        var scalM=new Matrix4();
+
+        var floatingcube = new Matrix4();
+
+        translaM=new Matrix4();
+        translaM.setTranslate(x+3,0,y-1.5);
+        floatingcube.multiply(translaM);
+
+        scalM=new Matrix4();
+        scalM.setScale(.5,.5,.5);
+        floatingcube.multiply(scalM);
+        if (!floatingCubes.includes(floatingcube)) {
+          floatingCubes.push(floatingcube);
+        }
+      }
+    }
+  }*/
+}
 //from textbook
 
 function initTextures(gl, n) {
@@ -444,24 +477,101 @@ function main() {
   {
     initEventHandlers(ev);
   });
-
-
-
+   
   var currentAngle = 0.0; // Current rotation angle
   // Register the event handler
-  /*canvas.onmousedown = function(ev) {   // Mouse is pressed
-    var x = ev.clientX, y = ev.clientY;
+  canvas.onmousedown = function(ev) {   // Mouse is pressed
+    /*var x = ev.clientX, y = ev.clientY;
     var rect = ev.target.getBoundingClientRect();
     if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-      // If Clicked position is inside the <canvas>, update the selected surface
+      // If pressed position is inside <canvas>, check if it is above object
       var x_in_canvas = x - rect.left, y_in_canvas = rect.bottom - y;
-      var face = checkFace(gl, 3, x_in_canvas, y_in_canvas, currentAngle, u_PickedFace, u_ViewMatrix, u_ModelMatrix);
-      u_PickedFace=face // Pass the surface number to u_PickedFace
-      //drawCube(g_camera.viewMatrix)
-      console.log(face);
-    }
+      var picked;
+      u_Clicked=1;
+      // Read pixel at the clicked position
+      var pixels = new Uint8Array(4); // Array for storing the pixel value
+      gl.readPixels(x_in_canvas, y_in_canvas, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     
-  }*/
+      //console.log(pixels);
+      if (pixels[0] == 0) // The mouse in on cube if R(pixels[0]) is 255
+        picked = true;
+    
+        u_Clicked=0;
+
+      //if(all)
+      if(allPoints.length==0){
+        allPoints.push(pixels[3]);
+        totalPoints=totalPoints+1;
+        //console.log(allPoints[x],pixels[3]);
+        if (picked) alert('You found a cube.');
+      }
+      else{
+        for(var x = 0; x<allPoints.length; x++){
+          console.log(allPoints[x],pixels[3]);
+          if (allPoints[x] == pixels[3]) {
+              break;
+          }
+          else{
+            if (picked) alert('You found a cube.');
+            allPoints.push(pixels[3]);
+            totalPoints=totalPoints+1;
+          }
+      }
+      }
+    }*/
+      //console.log(floatingCubes);
+      ///console.log()
+    
+
+    
+    var x = Math.round(g_camera.eye.elements[0]);
+    var y = Math.round(g_camera.eye.elements[1]);
+    var z = Math.round(g_camera.eye.elements[2]);  
+
+    //console.log("g_globalRotationAngle_horizontal: " + g_globalRotationAngle_horizontal);
+    //console.log("performClick: " + g_camera.eye.elements[0] + ", " + g_camera.eye.elements[1] + ", " + g_camera.eye.elements[2]);
+    //console.log("performClick: " + x + ", " + y + ", " + z);
+
+    var rotation_normalized = (gAnimalGlobalRotation) % 360;
+    if(rotation_normalized < 0) {
+      rotation_normalized = rotation_normalized + 360;
+    }
+    var direction = Math.round(rotation_normalized / 90);
+    var z_offset = 0;
+    var x_offset = 0;
+    if(direction == 0) {
+      z_offset = -1;
+    }
+    if(direction == 1) {
+      x_offset = 1;
+    }
+    if(direction == 2) {
+      z_offset = 1;
+    }
+    if(direction == 3) {
+      x_offset = -1;
+    }
+    console.log(x,y,z);
+    console.log(x + x_offset, y, z + z_offset);
+    console.log(x + x_offset, y-1, z + z_offset);
+    console.log("I'm here",g_camera.at.elements);
+
+    deleteFloatingCube(x,y,z);
+    //deleteFloatingCube(x + x_offset, y, z + z_offset);
+    //deleteFloatingCube(x + x_offset, y-1, z + z_offset);
+
+    var rect = ev.target.getBoundingClientRect();
+    var x_in_canvas = (ev.clientX) - rect.left, y_in_canvas = rect.bottom - (ev.clientY);
+    var pixels = new Uint8Array(4); // Array for storing the pixel value
+    gl.readPixels(x_in_canvas, y_in_canvas, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+  
+    //console.log(pixels);
+    if (pixels[0] == 0) // The mouse in on cube if R(pixels[0]) is 255
+      picked = true;
+  
+     if (picked) alert('You found a cube.');
+  }
+
 
   initTextures(gl,0);
   renderScene();
@@ -524,7 +634,8 @@ function keydown(ev) {
    /*console.log(JerPos[0],JerPos[1],JerPos[2]);
   }*/
   //initTextures(gl,0);
-  //renderAllShapes();
+  //renderAllShapes()
+
   renderScene();
 }
 var g_MvpMatrix = new Matrix4(); // Model view projection matrix

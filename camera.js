@@ -93,7 +93,7 @@ class Camera {
     w.set(this.at);
     w.sub(this.eye);
     w.normalize();
-    w.mul(.05);
+    w.mul(this.speed);
     var s = Vector3.cross(this.up, w);
     this.at.add(s);
     this.eye.add(s);
@@ -105,7 +105,7 @@ class Camera {
     r.set(this.eye);
     r.sub(this.at);
     r.normalize();
-    r.mul(.05);
+    r.mul(this.speed);
     var s = Vector3.cross(this.up, r);
     this.at.add(s);
     this.eye.add(s);
