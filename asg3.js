@@ -112,8 +112,25 @@ function addActionsForUI() { // used this resource "https://www.w3schools.com/ho
   else{
   sendTextToHTML("You Win!", "points")
   }
-}
 
+  document.onclick = (e) => {
+    var blockPos = [];
+    blockPos.push(Math.round(g_camera.at.elements[0]) + 16);
+    blockPos.push(Math.round(g_camera.at.elements[1]) - -20);
+    blockPos.push(Math.round(g_camera.at.elements[2]) + 16);
+
+    console.log(blockPos)
+    for (let x = 0; x<15; x++){
+      for (let y = 0; y<15; y++){
+        //translateK.setTranslate(x+3,-.75-3,y-1.0);
+        if(blockPos[0]==x+3 && blockPos[2]==y-1.0){
+          g_map[x][y]=0;
+      }
+    }
+  }
+  
+}
+}
 
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -195,7 +212,6 @@ function connectVariablesToGLSL() {
   //gl.uniformMatrix4fv(u_ProjectionMatrix, false, new Matrix4().elements);
   
 }
-let moveAll=new Matrix4();
 
 function updateAnimationAngles(){
   if(animate==true){
@@ -227,7 +243,6 @@ let moveX=0
 let moveZ=0
 
 function drawMap(g_map){
-  moveAll.setTranslate(moveX,0,moveZ);
   for(x=0;x<15;x++){
     for(y=0;y<15;y++){
       //console.log(x,y);
@@ -238,7 +253,6 @@ function drawMap(g_map){
         scaleM=new Matrix4();
         scaleM.setScale(.5,8,.5);
         body.multiply(translateK);
-        body.multiply(moveAll);
         body.multiply(scaleM);
         let uv=[
           0,0, 0,2, 2,.3,
@@ -259,7 +273,7 @@ function drawMap(g_map){
         translaM=new Matrix4();
         translaM.setTranslate(x+3,0+(float/20),y-1.5);
         floatingcube.multiply(translaM);
-        floatingcube.multiply(moveAll);
+        //floatingcube.multiply(moveAll);
 
         scalM=new Matrix4();
         scalM.setScale(.5,.5,.5);
@@ -414,30 +428,10 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, n); // Draw the rectangle
 
 }
-/*var eye=new Vector3([0,0,1.4]);
-var at=new Vector3([0,0,-1.0]);
-var up=new Vector3([0,1,0]);
-var w=new Vector3(0.0,0.0,0.0);
-*/
+
 let lastX = -1;
 let lastY = -1;
 
-/*let u_Clicked=false;
-function check(gl, n, x, y, currentAngle, u_Clicked, viewProjMatrix, u_MvpMatrix) {
-  var picked = false;
-  u_Clicked=true;
-  // Read pixel at the clicked position
-  var pixels = new Uint8Array(4); // Array for storing the pixel value
-  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-
-  console.log(pixels);
-
-  if (pixels[0] == 52 || pixels[0]==51) // The mouse in on cube if R(pixels[0]) is 255
-    picked = true;
-  
-  u_Clicked=false;
-  return picked;
-}*/
 
 function main() {
   setupWebGL();
@@ -445,23 +439,29 @@ function main() {
   addActionsForUI();
   
   document.onkeydown=keydown;
-  canvas.addEventListener('mousemove', function(ev) {initEventHandlers(ev)});
-  var currentAngle = 0.0; 
+  canvas.addEventListener('mousemove', 
+  function(ev) 
+  {
+    initEventHandlers(ev);
+  });
 
-/*
-  canvas.onmousedown = function(ev) {
+
+
+  var currentAngle = 0.0; // Current rotation angle
+  // Register the event handler
+  /*canvas.onmousedown = function(ev) {   // Mouse is pressed
     var x = ev.clientX, y = ev.clientY;
     var rect = ev.target.getBoundingClientRect();
-    if (rect.left <= x && x < rect.right &&
-          rect.top <= y && y < rect.bottom) {
-        var x_in_canvas = x - rect.left,
-              y_in_canvas = rect.bottom - y;
-        var picked= check(gl, x_in_canvas,y_in_canvas, u_Clicked);
-        if (picked) alert('The triangle was selected! ');
-      }
-  }
-  */
-
+    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
+      // If Clicked position is inside the <canvas>, update the selected surface
+      var x_in_canvas = x - rect.left, y_in_canvas = rect.bottom - y;
+      var face = checkFace(gl, 3, x_in_canvas, y_in_canvas, currentAngle, u_PickedFace, u_ViewMatrix, u_ModelMatrix);
+      u_PickedFace=face // Pass the surface number to u_PickedFace
+      //drawCube(g_camera.viewMatrix)
+      console.log(face);
+    }
+    
+  }*/
 
   initTextures(gl,0);
   renderScene();
