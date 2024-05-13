@@ -1,10 +1,10 @@
 class Camera {
   constructor(aspectRatio,near,far) {
-    this.fov =80.0;
+    this.fov =70.0;
     this.eye=new Vector3([0.0,0.0,1.0]);
     this.at=new Vector3([0.0,0.0,-1.0]);
     this.up=new Vector3([0.0,1.0,0.0]);
-    this.speed = 0.05;
+    this.speed = 1;
 
     //this.updateView();
     this.projectionMatrix=new Matrix4();
@@ -28,6 +28,10 @@ class Camera {
       this.up.elements[0],this.up.elements[1],this.up.elements[2]); //eye, at, up
   }
   moveForward(){
+    //console.log(this.eye.elements);
+    //moveX=moveX-1;
+    //console.log(moveX);
+    
     var f = new Vector3(0.0,0.0,0.0);            
     f.set(this.at);                 
     f.sub(this.eye);
@@ -36,7 +40,8 @@ class Camera {
     this.eye.add(f);                
     this.at.add(f);                 
     this.setLook();
-    
+    //this.resetPerspective();
+
     /*var w = new Vector3(0.0,0.0,0.0);
     console.log("w ",w.elements);
    
@@ -59,6 +64,7 @@ class Camera {
     */
   }
   moveBackward(){
+    
     var b = new Vector3;
     b.set(this.eye);
     b.sub(this.at);
@@ -68,6 +74,9 @@ class Camera {
     this.at.add(b);
     this.eye.add(b);
     this.setLook();
+
+    moveX=moveX+1;
+    console.log(moveX);
 
     /*var w = new Vector3(0.0,0.0,0.0);
     w.set(this.eye);
@@ -117,8 +126,8 @@ class Camera {
     gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
 */
     console.log("panUp");
-    this.eye.elements[1] += .10;
-    
+    //this.eye.elements[1] += .10;
+    this.at.elements[1] += .10;
     this.setLook();
      //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
@@ -128,7 +137,8 @@ class Camera {
     gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
     */
     console.log("panDown");
-    this.eye.elements[1] -= .10;
+    //this.eye.elements[1] -= .10;
+    this.at.elements[1] -= .10;
     this.setLook(); 
        //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
     

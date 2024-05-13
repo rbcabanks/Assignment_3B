@@ -10,7 +10,7 @@ var VSHADER_SOURCE =
   'uniform mat4 u_ProjectionMatrix;\n' +
   'uniform float u_Size;\n' +
   'void main() {\n' +
-  '  gl_Position = u_ViewMatrix* u_ProjectionMatrix* u_GlobalRotateMatrix* u_ModelMatrix * a_Position;\n' +
+  '  gl_Position = u_ProjectionMatrix*u_ViewMatrix*  u_GlobalRotateMatrix* u_ModelMatrix * a_Position;\n' +
   '  gl_PointSize = u_Size;\n' +
   '  v_UV = a_UV; \n'+
   '}\n';
@@ -97,10 +97,8 @@ let animate=true;
 let u_texColorWeight;
 let a_UV;
 
-let moveAll=new Matrix4();
 
-
-let gAnimalGlobalRotation=120; // was 40
+let gAnimalGlobalRotation=90; // was 40
 let gAnimalGlobalRotationy=0;
 function addActionsForUI() { // used this resource "https://www.w3schools.com/howto/howto_js_rangeslider.asp"
  //document.getElementById('camera').addEventListener('mousemove', function () {gAnimalGlobalRotation=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
@@ -197,11 +195,12 @@ function connectVariablesToGLSL() {
   //gl.uniformMatrix4fv(u_ProjectionMatrix, false, new Matrix4().elements);
   
 }
+let moveAll=new Matrix4();
 
 function updateAnimationAngles(){
   if(animate==true){
-    wings=10*Math.sin(g_seconds*2);
-    float=2*Math.sin(g_seconds*2);
+    //wings=10*Math.sin(g_seconds*2);
+    float=10*Math.sin(g_seconds/30);
   }
 
 }
@@ -224,15 +223,22 @@ var g_map=[
 ];
 let len=0;
 let floatingCubes=[]
+let moveX=0
+let moveZ=0
+
 function drawMap(g_map){
+  moveAll.setTranslate(moveX,0,moveZ);
   for(x=0;x<15;x++){
     for(y=0;y<15;y++){
       //console.log(x,y);
       if(g_map[x][y]==1){
         var body = new Matrix4();
-        body.setTranslate(x+3,-.75-3,y-1.5);
+        var translateK=new Matrix4();
+        translateK.setTranslate(x+3,-.75-3,y-1.0);
         scaleM=new Matrix4();
-        scaleM.setScale(.5,8,.5);
+        scaleM.setScale(.5,2,.5);
+        body.multiply(translateK);
+        body.multiply(moveAll);
         body.multiply(scaleM);
         let uv=[
           0,0, 0,2, 2,.3,
@@ -243,18 +249,8 @@ function drawMap(g_map){
       }
 
       if(g_map[x][y]==2){
-  
         var translaM=new Matrix4();
         var scalM=new Matrix4();
-/*
-        blocks= new Matrix4();
-        translaM.setTranslate(g_camera.eye.elements[0]+4,g_camera.eye.elements[1],g_camera.eye.elements[2])
-        scalM.setScale(.2,.2,.2)
-        blocks.multiply(translaM);
-        blocks.multiply(scalM);
-        drawCube(blocks);
-        console.log(blocks.elements)
-      */
 
         var floatingcube = new Matrix4();
         //scaleMf.setScale(1,1,1);
@@ -263,6 +259,7 @@ function drawMap(g_map){
         translaM=new Matrix4();
         translaM.setTranslate(x+3,0+(float/20),y-1.5);
         floatingcube.multiply(translaM);
+        floatingcube.multiply(moveAll);
 
         scalM=new Matrix4();
         scalM.setScale(.5,.5,.5);
@@ -300,6 +297,7 @@ function renderScene(){
   modelMatrix1.multiply(scaleM);
   translateM.setTranslate(0,-20,0);
   modelMatrix1.multiply(translateM);
+  
   rgba=[0.0,0.2,0.5,1.0];
   gl.uniform1i(u_whichTexture,-3);
   //gl.activeTexture(gl.TEXTURE1);
@@ -476,8 +474,8 @@ function main() {
 }
 
  
-var g_startTime=performance.now()/240;
-var g_seconds=performance.now()/240-g_startTime;
+var g_startTime=performance.now()/20;
+var g_seconds=performance.now()/20-g_startTime;
 
 function keydown(ev) {
   if(ev.keyCode == 87) { // The w key was pressed
@@ -563,7 +561,7 @@ function initEventHandlers(ev) {
 }
 
 function tick(){
-  g_seconds=performance.now()/240-g_startTime;
+  g_seconds=performance.now()/20-g_startTime;
   updateAnimationAngles();
   renderScene();
   requestAnimationFrame(tick);
