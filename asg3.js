@@ -232,7 +232,7 @@ function drawMap(g_map){
         var body = new Matrix4();
         body.setTranslate(x+3,-.75-3,y-1.5);
         scaleM=new Matrix4();
-        scaleM.setScale(.5,2,.5);
+        scaleM.setScale(.5,8,.5);
         body.multiply(scaleM);
         let uv=[
           0,0, 0,2, 2,.3,
@@ -246,7 +246,7 @@ function drawMap(g_map){
   
         var translaM=new Matrix4();
         var scalM=new Matrix4();
-
+/*
         blocks= new Matrix4();
         translaM.setTranslate(g_camera.eye.elements[0]+4,g_camera.eye.elements[1],g_camera.eye.elements[2])
         scalM.setScale(.2,.2,.2)
@@ -254,7 +254,7 @@ function drawMap(g_map){
         blocks.multiply(scalM);
         drawCube(blocks);
         console.log(blocks.elements)
-      
+      */
 
         var floatingcube = new Matrix4();
         //scaleMf.setScale(1,1,1);
