@@ -556,7 +556,7 @@ function main() {
     console.log(x + x_offset, y-1, z + z_offset);
     console.log("I'm here",g_camera.at.elements);
 
-    deleteFloatingCube(x,y,z);
+    //deleteFloatingCube(x,y,z);
     //deleteFloatingCube(x + x_offset, y, z + z_offset);
     //deleteFloatingCube(x + x_offset, y-1, z + z_offset);
 
