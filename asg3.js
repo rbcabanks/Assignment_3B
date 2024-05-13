@@ -11,7 +11,6 @@ var VSHADER_SOURCE =
   'uniform float u_Size;\n' +
   'void main() {\n' +
   '  gl_Position = u_ViewMatrix* u_ProjectionMatrix* u_GlobalRotateMatrix* u_ModelMatrix * a_Position;\n' +
-  //'gl_Position =a_Position;\n'+
   '  gl_PointSize = u_Size;\n' +
   '  v_UV = a_UV; \n'+
   '}\n';
@@ -98,6 +97,7 @@ let animate=true;
 let u_texColorWeight;
 let a_UV;
 
+let moveAll=new Matrix4();
 
 
 let gAnimalGlobalRotation=120; // was 40
@@ -128,7 +128,7 @@ function setupWebGL() {
   }
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  g_camera=new Camera(canvas.width/canvas.height,.1,1000);
+  g_camera=new Camera(canvas.width/canvas.height,.1,500);
 
 }
 
@@ -192,9 +192,9 @@ function connectVariablesToGLSL() {
     console.log('Failed to get the storage location of u_ProjectionMatrix');
     return;
   }
-  gl.uniformMatrix4fv(u_ModelMatrix, false, new Matrix4().elements);
-  gl.uniformMatrix4fv(u_ViewMatrix, false, new Matrix4().elements);
-  gl.uniformMatrix4fv(u_ProjectionMatrix, false, new Matrix4().elements);
+  //gl.uniformMatrix4fv(u_ModelMatrix, false, new Matrix4().elements);
+  //gl.uniformMatrix4fv(u_ViewMatrix, false, new Matrix4().elements);
+  //gl.uniformMatrix4fv(u_ProjectionMatrix, false, new Matrix4().elements);
   
 }
 
@@ -231,8 +231,8 @@ function drawMap(g_map){
       if(g_map[x][y]==1){
         var body = new Matrix4();
         body.setTranslate(x+3,-.75-3,y-1.5);
-        var scaleM=new Matrix4();
-        scaleM.setScale(.5,8,.5);
+        scaleM=new Matrix4();
+        scaleM.setScale(.5,2,.5);
         body.multiply(scaleM);
         let uv=[
           0,0, 0,2, 2,.3,
@@ -243,39 +243,40 @@ function drawMap(g_map){
       }
 
       if(g_map[x][y]==2){
+  
+        var translaM=new Matrix4();
+        var scalM=new Matrix4();
+
+        blocks= new Matrix4();
+        translaM.setTranslate(g_camera.eye.elements[0]+4,g_camera.eye.elements[1],g_camera.eye.elements[2])
+        scalM.setScale(.2,.2,.2)
+        blocks.multiply(translaM);
+        blocks.multiply(scalM);
+        drawCube(blocks);
+        console.log(blocks.elements)
+      
+
         var floatingcube = new Matrix4();
         //scaleMf.setScale(1,1,1);
         //body.multiply(scaleMf);
         //translateM.setTranslate(x+3,.75,y-1.5);
-        var translaM=new Matrix4();
+        translaM=new Matrix4();
         translaM.setTranslate(x+3,0+(float/20),y-1.5);
         floatingcube.multiply(translaM);
 
-        var scalM=new Matrix4();
+        scalM=new Matrix4();
         scalM.setScale(.5,.5,.5);
         floatingcube.multiply(scalM);
-        floatingCubes.push(floatingcube);
+        //floatingCubes.push(floatingcube);
         rgba=[0.0,0.2,0.5,1.0];
         gl.uniform1i(u_whichTexture,-3);
         drawCube(floatingcube);
       }
-      if(g_map[x][y]==3){
-        var body = new Matrix4();
-        body.setTranslate(x+3,-.75-3,y-1.5);
-        var scaleM=new Matrix4();
-        scaleM.setScale(.5,2,.5);
-        body.multiply(scaleM);
-        rgba=[1,.0,0,1];
-        gl.uniform1i(u_whichTexture,-2);
-        drawCube(body);
-      }
     }
   }
-} 
-
+}
 function renderScene(){
 
-  let translateAll=0;
   var startTime=performance.now();
   updateAnimationAngles();
   renderAllShapes();
@@ -313,16 +314,16 @@ function renderScene(){
   gl.uniform1i(u_whichTexture,0);
   drawCubeUV(modelMatrix,uv);
 
-  drawMap(g_map);
+  drawMap(g_map)
 
   var duration = performance.now()-startTime;
   sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
 }
 
-
 function renderAllShapes() {
-  gl.uniformMatrix4fv(u_ViewMatrix,false,g_camera.viewMatrix.elements);
+  g_camera.setLook();
   gl.uniformMatrix4fv(u_ProjectionMatrix,false,g_camera.projectionMatrix.elements);
+  gl.uniformMatrix4fv(u_ViewMatrix,false,g_camera.viewMatrix.elements);
 
   let globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation,gAnimalGlobalRotationy,1,0);
   //globalRotMat.rotate(gAnimalGlobalRotationy,1,0,0);
@@ -334,6 +335,7 @@ function renderAllShapes() {
     console.log('Failed to get the storage location of u_xformMatrix');
     return;
   }
+  
   gl.uniformMatrix4fv(u_ModelMatrix, false, xformMatrix.elements);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -422,6 +424,23 @@ var w=new Vector3(0.0,0.0,0.0);
 let lastX = -1;
 let lastY = -1;
 
+/*let u_Clicked=false;
+function check(gl, n, x, y, currentAngle, u_Clicked, viewProjMatrix, u_MvpMatrix) {
+  var picked = false;
+  u_Clicked=true;
+  // Read pixel at the clicked position
+  var pixels = new Uint8Array(4); // Array for storing the pixel value
+  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+  console.log(pixels);
+
+  if (pixels[0] == 52 || pixels[0]==51) // The mouse in on cube if R(pixels[0]) is 255
+    picked = true;
+  
+  u_Clicked=false;
+  return picked;
+}*/
+
 function main() {
   setupWebGL();
   connectVariablesToGLSL();
@@ -429,6 +448,22 @@ function main() {
   
   document.onkeydown=keydown;
   canvas.addEventListener('mousemove', function(ev) {initEventHandlers(ev)});
+  var currentAngle = 0.0; 
+
+/*
+  canvas.onmousedown = function(ev) {
+    var x = ev.clientX, y = ev.clientY;
+    var rect = ev.target.getBoundingClientRect();
+    if (rect.left <= x && x < rect.right &&
+          rect.top <= y && y < rect.bottom) {
+        var x_in_canvas = x - rect.left,
+              y_in_canvas = rect.bottom - y;
+        var picked= check(gl, x_in_canvas,y_in_canvas, u_Clicked);
+        if (picked) alert('The triangle was selected! ');
+      }
+  }
+  */
+
 
   initTextures(gl,0);
   renderScene();
@@ -438,9 +473,9 @@ function main() {
   // Clear <canvas>
   //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   requestAnimationFrame(tick);
-} 
+}
 
-let currentAngle=[0.0,0.0]; 
+ 
 var g_startTime=performance.now()/240;
 var g_seconds=performance.now()/240-g_startTime;
 
@@ -473,12 +508,6 @@ function keydown(ev) {
   }
 
 
-  var x = ev.clientX;
-  var y = ev.clientY;
-  let JerPos = [];
-  JerPos.push(Math.round(g_camera.at.elements[0]) + 16);
-  JerPos.push(Math.round(g_camera.at.elements[1]) - -1);
-  JerPos.push(Math.round(g_camera.at.elements[2]) + 16);
 /*
   if(e.button == 2) {
     // Right click = place block
@@ -487,16 +516,17 @@ function keydown(ev) {
     // Left click = remove block
     removeJerry(blockPos[0], blockPos[1], blockPos[2]);
   }*/
-  if(ev.keyCode==67) { // left click
+  
+  /*if(ev.keyCode==67) { // left click
     /*this.chunk.deleteBlock(cx, cy, cz);
     this.chunk.deleteBlock(cx + cx_offset, cy, cz + cz_offset);
     this.chunk.deleteBlock(cx + cx_offset, cy-1, cz + cz_offset);  */
     //drawCube(cx + cx_offset, cy, cz + cz_offset, 2);  
     //removeJerry(blockPos[0], blockPos[1], blockPos[2]);
-    console.log(JerPos[0],JerPos[1],JerPos[2]);
-  }
-
+   /*console.log(JerPos[0],JerPos[1],JerPos[2]);
+  }*/
   //initTextures(gl,0);
+  //renderAllShapes();
   renderScene();
 }
 var g_MvpMatrix = new Matrix4(); // Model view projection matrix
