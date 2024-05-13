@@ -236,7 +236,7 @@ function drawMap(g_map){
         var translateK=new Matrix4();
         translateK.setTranslate(x+3,-.75-3,y-1.0);
         scaleM=new Matrix4();
-        scaleM.setScale(.5,2,.5);
+        scaleM.setScale(.5,8,.5);
         body.multiply(translateK);
         body.multiply(moveAll);
         body.multiply(scaleM);
@@ -305,7 +305,7 @@ function renderScene(){
 
 //sky
   modelMatrix=new Matrix4();
-  scaleM.setScale(1000,1000,1000);
+  scaleM.setScale(300,300,300);
   modelMatrix.multiply(scaleM);
   translateM.setTranslate(0,.5,0);
   modelMatrix.multiply(translateM);
