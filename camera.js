@@ -113,34 +113,32 @@ class Camera {
     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panLeft(){
-    gAnimalGlobalRotation=gAnimalGlobalRotation-3;
-    console.log("panLeft");
+    var left = new Vector3();
+    left.set(this.at);
+    left.sub(this.eye);
+    let rotationMatrixL = new Matrix4();
+		rotationMatrixL.setIdentity();
+		rotationMatrixL.setRotate(1, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+		let s = rotationMatrixL.multiplyVector3(left);
+		this.at = s.add(this.eye);
   }
   panRight(){
-    gAnimalGlobalRotation=gAnimalGlobalRotation+3;
-    console.log("panRight");
+    var right = new Vector3();
+    right.set(this.at);
+    right.sub(this.eye);
+    let rotationMatrixR = new Matrix4();
+		rotationMatrixR.setIdentity();
+		rotationMatrixR.setRotate(-1, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+		let k = rotationMatrixR.multiplyVector3(right);
+		this.at = k.add(this.eye);
   }
   panUp(){
-    ////gAnimalGlobalRotationy=gAnimalGlobalRotationy+.1;
-    /*var globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation+2,1,0,0);
-    gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
-*/
-    console.log("panUp");
-    //this.eye.elements[1] += .10;
     this.at.elements[1] += .10;
     this.setLook();
-     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panDown(){
-    ////gAnimalGlobalRotationy=gAnimalGlobalRotationy-.1;
-    /*var globalRotMat=new Matrix4().rotate(gAnimalGlobalRotation-2,1,0,0);
-    gl.uniformMatrix4fv(u_GlobalRotateMatrix,false,globalRotMat.elements);
-    */
-    console.log("panDown");
-    //this.eye.elements[1] -= .10;
     this.at.elements[1] -= .10;
     this.setLook(); 
-       //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
     
   }
   

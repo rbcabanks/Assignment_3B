@@ -307,7 +307,7 @@ function renderScene(){
   modelMatrix=new Matrix4();
   scaleM.setScale(300,300,300);
   modelMatrix.multiply(scaleM);
-  translateM.setTranslate(0,.5,0);
+  translateM.setTranslate(0,.1,0);
   modelMatrix.multiply(translateM);
   gl.uniform1i(u_whichTexture,0);
   drawCubeUV(modelMatrix,uv);
