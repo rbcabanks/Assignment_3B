@@ -138,12 +138,14 @@ function drawCube(vertices) {
     gl.enableVertexAttribArray(a_Position);
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(face1),gl.DYNAMIC_DRAW);
-    gl.uniform4f(u_FragColor, rgba[0]*.9, rgba[1]*.9, rgba[2]*.9, rgba[3]*.9);
+    gl.uniform4f(u_FragColor, rgba[0]*.9, rgba[1]*.9, rgba[2]*.9, rgba[3]);
     gl.uniformMatrix4fv(u_ModelMatrix,false,vertices.elements);
+    //console.log("vertices face1",vertices.elements);
     gl.drawArrays(gl.TRIANGLES,0, face1.length/3);
+   
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(face2),gl.DYNAMIC_DRAW);
-    gl.uniform4f(u_FragColor, rgba[0]*.8, rgba[1]*.8, rgba[2]*.8, rgba[3]*.8);
+    gl.uniform4f(u_FragColor, rgba[0]*.8, rgba[1]*.8, rgba[2]*.8, rgba[3]);
     gl.uniformMatrix4fv(u_ModelMatrix,false,vertices.elements);
     gl.drawArrays(gl.TRIANGLES,0, face2.length/3);
 

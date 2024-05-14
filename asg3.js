@@ -109,12 +109,12 @@ function addActionsForUI() { // used this resource "https://www.w3schools.com/ho
  //document.getElementById('wings').addEventListener('mousemove', function () {wings=this.value; renderScene();}); //g_selectedColor[0]=this.value/100;
  //document.getElementById('on').onclick = function () {animate=true};
  //document.getElementById('off').onclick = function () {animate=false};
-
- if(points!=10){
-  sendTextToHTML(allPoints.length, "points")}
+ 
+ if(totalPoints!=10){
+  sendTextToHTML(totalPoints, "points")}
   else{
   sendTextToHTML("You Win!", "points")
-  }
+}
   
 }
 
@@ -226,20 +226,23 @@ var g_map=[
 ];
 let len=0;
 let floatingCubes=[]
+let floatingCubeCoords=[]
 let moveX=0
 let moveZ=0
 
 function drawMap(g_map){
   floatingCubes=[]
+ 
   for(x=0;x<15;x++){
     for(y=0;y<15;y++){
       //console.log(x,y);
+      //console.log(x,2,y);
       if(g_map[x][y]==1){
         var body = new Matrix4();
         var translateK=new Matrix4();
-        translateK.setTranslate(x+3,-.75-3,y-1.0);
+        translateK.setTranslate(x,2,y-1.0);
         scaleM=new Matrix4();
-        scaleM.setScale(.5,8,.5);
+        scaleM.setScale(.5,3,.5);
         body.multiply(translateK);
         body.multiply(scaleM);
         let uv=[
@@ -255,26 +258,30 @@ function drawMap(g_map){
         var scalM=new Matrix4();
 
         var floatingcube = new Matrix4();
-        //scaleMf.setScale(1,1,1);
-        //body.multiply(scaleMf);
-        //translateM.setTranslate(x+3,.75,y-1.5);
+        
         translaM=new Matrix4();
-        translaM.setTranslate(x+3,0,y-1.5);
+        translaM.setTranslate(x,0,y-1.0);
         floatingcube.multiply(translaM);
-
         scalM=new Matrix4();
         scalM.setScale(.5,.5,.5);
         floatingcube.multiply(scalM);
         if (!floatingCubes.includes(floatingcube)) {
           floatingCubes.push(floatingcube);
+          if (!floatingCubeCoords.includes([x,y])) {
+            floatingCubeCoords.push([x,y]);
+          }
         }
-        //floatingCubes.push(floatingcube);
-        /*rgba=[0.0,0.2,0.5,1.0];
-        gl.uniform1i(u_whichTexture,-3);
-        drawCube(floatingcube);
-        */
       }
     }
+/*
+    console.log(g_camera.at.elements[0]);
+    var cube=new Matrix4();
+    var cub32=new Matrix4();
+    rgba=[0.0,1,0.5,1.0];
+    gl.uniform1i(u_whichTexture,4);
+    cube.translate(g_camera.at.elements[2]+5,g_camera.at.elements[1],g_camera.at.elements[0]);
+    //cube.multiply(cub32);
+    drawCube(cube);*/
   }
   //console.log(floatingCubes.length);
 }
@@ -284,6 +291,7 @@ function renderScene(){
   updateAnimationAngles();
   renderAllShapes();
   
+
   //gl.uniform1i(u_texColorWeight,0.8);
 
   let translateM= new Matrix4();
@@ -294,8 +302,8 @@ function renderScene(){
 //floor
 
   let uv=[
-    0,0,0,.5,1,1,
-    0,0,2,.5,1,0,
+    0,0,0,1,1,1,
+    0,0,1,1,1,0,
   ]
 
   let modelMatrix1=new Matrix4();
@@ -324,14 +332,30 @@ function renderScene(){
   drawMap(g_map)
 
   for(let x=0;x<floatingCubes.length;x++){
+
+            //x= 0-15
+            //y= 0-15
+            //each floating cube is at (x+3, (float/20) , y-1.5) location;
+
     translateM=new Matrix4();
     translateM.setTranslate(0,(float/20),0)
     floatingCubes[x].multiply(translateM);
-    rgba=[0.0,0.0,0,1];
+    //console.log(floatingCubeCoords[x][0]+3,float/20,floatingCubeCoords[x][1]-1.5);
+
+    var colors = new Uint8Array(2);
+    //colors[0]=;//floatingCubeCoords[x][0];
+    colors[1]=0;//floatingCubeCoords[x][1];
+    const decimalToHex = dec => dec.toString(16);
+    colors[0]=floatingCubeCoords[x][0];
+    colors[1]=floatingCubeCoords[x][1];
+    
+    rgba=[0,0,0,floatingCubeCoords[x][0]];
+    //rgba=[0,0,0,1];
     gl.uniform1i(u_whichTexture,-2);
     drawCube(floatingCubes[x]);
   }
   
+
   var duration = performance.now()-startTime;
   sendTextToHTML(("ms:" + Math.floor(duration)+" fps:"+ Math.floor(10000/duration)/10), "numdot")
 }
@@ -366,36 +390,16 @@ function sendTextToHTML(text,htmlID){
   htmlElm.innerHTML=text;
 }
 
-function deleteFloatingCube(a,b,c){
-  x=a-3;
-  y=c+1.5;
+
+  /*
+  console.log(a,c)
+  var x=a-3;
+  var y=c+1.5;
+  console.log(x,y)
   if(g_map[x][y]==2){
     g_map[x][y]=0;
-  }
-  /*
-  for(x=0;x<15;x++){
-    for(y=0;y<15;y++){
-      if(g_map[x][y]==2){
-        var translaM=new Matrix4();
-        var scalM=new Matrix4();
-
-        var floatingcube = new Matrix4();
-
-        translaM=new Matrix4();
-        translaM.setTranslate(x+3,0,y-1.5);
-        floatingcube.multiply(translaM);
-
-        scalM=new Matrix4();
-        scalM.setScale(.5,.5,.5);
-        floatingcube.multiply(scalM);
-        if (!floatingCubes.includes(floatingcube)) {
-          floatingCubes.push(floatingcube);
-        }
-      }
-    }
   }*/
-}
-//from textbook
+
 
 function initTextures(gl, n) {
   var texture = gl.createTexture();   // Create a texture object
@@ -481,95 +485,54 @@ function main() {
   var currentAngle = 0.0; // Current rotation angle
   // Register the event handler
   canvas.onmousedown = function(ev) {   // Mouse is pressed
-    /*var x = ev.clientX, y = ev.clientY;
-    var rect = ev.target.getBoundingClientRect();
-    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-      // If pressed position is inside <canvas>, check if it is above object
-      var x_in_canvas = x - rect.left, y_in_canvas = rect.bottom - y;
-      var picked;
-      u_Clicked=1;
-      // Read pixel at the clicked position
-      var pixels = new Uint8Array(4); // Array for storing the pixel value
-      gl.readPixels(x_in_canvas, y_in_canvas, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    
-      //console.log(pixels);
-      if (pixels[0] == 0) // The mouse in on cube if R(pixels[0]) is 255
-        picked = true;
-    
-        u_Clicked=0;
-
-      //if(all)
-      if(allPoints.length==0){
-        allPoints.push(pixels[3]);
-        totalPoints=totalPoints+1;
-        //console.log(allPoints[x],pixels[3]);
-        if (picked) alert('You found a cube.');
-      }
-      else{
-        for(var x = 0; x<allPoints.length; x++){
-          console.log(allPoints[x],pixels[3]);
-          if (allPoints[x] == pixels[3]) {
-              break;
-          }
-          else{
-            if (picked) alert('You found a cube.');
-            allPoints.push(pixels[3]);
-            totalPoints=totalPoints+1;
-          }
-      }
-      }
-    }*/
-      //console.log(floatingCubes);
-      ///console.log()
-    
-
-    
-    var x = Math.round(g_camera.eye.elements[0]);
-    var y = Math.round(g_camera.eye.elements[1]);
-    var z = Math.round(g_camera.eye.elements[2]);  
-
-    //console.log("g_globalRotationAngle_horizontal: " + g_globalRotationAngle_horizontal);
-    //console.log("performClick: " + g_camera.eye.elements[0] + ", " + g_camera.eye.elements[1] + ", " + g_camera.eye.elements[2]);
-    //console.log("performClick: " + x + ", " + y + ", " + z);
-
-    var rotation_normalized = (gAnimalGlobalRotation) % 360;
-    if(rotation_normalized < 0) {
-      rotation_normalized = rotation_normalized + 360;
-    }
-    var direction = Math.round(rotation_normalized / 90);
-    var z_offset = 0;
-    var x_offset = 0;
-    if(direction == 0) {
-      z_offset = -1;
-    }
-    if(direction == 1) {
-      x_offset = 1;
-    }
-    if(direction == 2) {
-      z_offset = 1;
-    }
-    if(direction == 3) {
-      x_offset = -1;
-    }
-    console.log(x,y,z);
-    console.log(x + x_offset, y, z + z_offset);
-    console.log(x + x_offset, y-1, z + z_offset);
-    console.log("I'm here",g_camera.at.elements);
-
-    //deleteFloatingCube(x,y,z);
-    //deleteFloatingCube(x + x_offset, y, z + z_offset);
-    //deleteFloatingCube(x + x_offset, y-1, z + z_offset);
-
     var rect = ev.target.getBoundingClientRect();
     var x_in_canvas = (ev.clientX) - rect.left, y_in_canvas = rect.bottom - (ev.clientY);
     var pixels = new Uint8Array(4); // Array for storing the pixel value
     gl.readPixels(x_in_canvas, y_in_canvas, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-  
+
+    const decimalToHex = dec => dec.toString(16);
+
+    var picked=false;
     //console.log(pixels);
-    if (pixels[0] == 0) // The mouse in on cube if R(pixels[0]) is 255
+    if (pixels[2] == 0) {// The mouse in on cube if R(pixels[0]) is 255
       picked = true;
+    }
   
-     if (picked) alert('You found a cube.');
+     if (picked){
+      //console.log("at",g_camera.at.elements[0],g_camera.at.elements[1],g_camera.at.elements[2])
+      //console.log("eye",g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]-2)
+      /*for(var x=0;x<floatingCubes.length;x++){
+        console.log(floatingCubeCoords[x][1]-1,float/20,(floatingCubeCoords[x][0]*-1)-1);
+      }*/
+      console.log("eye",g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]-2)
+      console.log("at",g_camera.at.elements[0],g_camera.at.elements[1],g_camera.at.elements[2])
+
+      for(var x=0;x<floatingCubes.length;x++){
+        //console.log(floatingCubeCoords[x][1]-1,float/20,(floatingCubeCoords[x][0]*-1)-1);
+        /*console.log("ff",floatingCubeCoords[x][1]-1,g_camera.at.elements[0]);
+        console.log("fe",(floatingCubeCoords[x][0]*-1.)-1,g_camera.at.elements[2]);*/
+
+        if(((floatingCubeCoords[x][1]-1)-g_camera.at.elements[0]<=1) && (((floatingCubeCoords[x][0]*-1)-1)==g_camera.at.elements[2]))
+          {
+            console.log("fc",floatingCubeCoords[x][1],float/20,(floatingCubeCoords[x][0]));
+            g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]]=0;
+            totalPoints=totalPoints+1;
+            console.log(totalPoints);
+
+            if(totalPoints!=10){
+              sendTextToHTML(totalPoints, "points")}
+              else{
+              sendTextToHTML("You Win!", "points")
+            }
+
+          }
+        if(((floatingCubeCoords[x][1]-1)==g_camera.eye.elements[0]) && (((floatingCubeCoords[x][0]*-1)-1)==g_camera.eye.elements[2]))
+          {
+            console.log("feye",floatingCubeCoords[x][1]-1,float/20,(floatingCubeCoords[x][0]*-1)-1);
+          }
+        }
+      }
+     picked=false;
   }
 
 

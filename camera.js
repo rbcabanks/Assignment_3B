@@ -118,7 +118,7 @@ class Camera {
     left.sub(this.eye);
     let rotationMatrixL = new Matrix4();
 		rotationMatrixL.setIdentity();
-		rotationMatrixL.setRotate(1, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+		rotationMatrixL.setRotate(3, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 		let s = rotationMatrixL.multiplyVector3(left);
 		this.at = s.add(this.eye);
   }
@@ -128,7 +128,7 @@ class Camera {
     right.sub(this.eye);
     let rotationMatrixR = new Matrix4();
 		rotationMatrixR.setIdentity();
-		rotationMatrixR.setRotate(-1, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+		rotationMatrixR.setRotate(-3, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 		let k = rotationMatrixR.multiplyVector3(right);
 		this.at = k.add(this.eye);
   }
