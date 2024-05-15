@@ -221,8 +221,8 @@ var g_map=[
   [1,0,1,0,0,0,1,0,1,0,0,0,2,0,1],
   [1,1,1,1,0,0,1,1,1,1,1,0,0,0,1],
   [1,0,0,1,0,0,1,0,0,0,1,0,0,0,1],
-  [1,2,0,0,0,0,0,0,2,0,1,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,0,2,0,1]
+  [1,2,0,0,0,0,0,0,2,0,1,0,2,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,0,0,0,1]
 ];
 let len=0;
 let floatingCubes=[]
@@ -512,8 +512,12 @@ function main() {
         /*console.log("ff",floatingCubeCoords[x][1]-1,g_camera.at.elements[0]);
         console.log("fe",(floatingCubeCoords[x][0]*-1.)-1,g_camera.at.elements[2]);*/
 
-        if(((floatingCubeCoords[x][1]-1)-g_camera.at.elements[0]<=1) && (((floatingCubeCoords[x][0]*-1)-1)==g_camera.at.elements[2]))
+        console.log("xy",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0],((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
+        if(((((floatingCubeCoords[x][1]-1)-g_camera.at.elements[0])<=1) && (((floatingCubeCoords[x][1]-1)-g_camera.at.elements[0])>=-1.5)) && ((((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]>=-1.5) && (((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]<=2)))
           {
+            console.log("xx",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0],((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
+
+            console.log(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0];
             console.log("fc",floatingCubeCoords[x][1],float/20,(floatingCubeCoords[x][0]));
             g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]]=0;
             totalPoints=totalPoints+1;
