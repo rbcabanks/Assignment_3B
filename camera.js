@@ -36,10 +36,12 @@ class Camera {
     f.set(this.at);                 
     f.sub(this.eye);
     f.normalize();                  
-    f.mul(this.speed);              
+    //f.mul(this.speed);              
     this.eye.add(f);                
     this.at.add(f);                 
     this.setLook();
+    console.log("forward at",this.at.elements);
+    console.log("forward eye",this.eye.elements);
     //this.resetPerspective();
 
     /*var w = new Vector3(0.0,0.0,0.0);
@@ -97,6 +99,7 @@ class Camera {
     var s = Vector3.cross(this.up, w);
     this.at.add(s);
     this.eye.add(s);
+    console.log("left",this.at.elements, this.eye.elements);
     this.setLook();
     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
  }
@@ -109,10 +112,13 @@ class Camera {
     var s = Vector3.cross(this.up, r);
     this.at.add(s);
     this.eye.add(s);
+    console.log("right",this.at.elements, this.eye.elements);
+
     this.setLook();
     //gl.uniformMatrix4fv(u_ViewMatrix,false,this.viewMatrix.elements);
   }
   panLeft(){
+    console.log("s1 at left",this.at.elements);
     var left = new Vector3();
     left.set(this.at);
     left.sub(this.eye);
@@ -120,9 +126,13 @@ class Camera {
 		rotationMatrixL.setIdentity();
 		rotationMatrixL.setRotate(3, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 		let s = rotationMatrixL.multiplyVector3(left);
+    console.log("s left",s.elements);
 		this.at = s.add(this.eye);
+    console.log("s at left",this.at.elements);
+    console.log("eye at left",this.eye.elements);
   }
   panRight(){
+    console.log("k1 at left",this.at.elements);
     var right = new Vector3();
     right.set(this.at);
     right.sub(this.eye);
@@ -130,7 +140,12 @@ class Camera {
 		rotationMatrixR.setIdentity();
 		rotationMatrixR.setRotate(-3, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
 		let k = rotationMatrixR.multiplyVector3(right);
+    console.log("k right",k.elements);
 		this.at = k.add(this.eye);
+    console.log("k at left",this.at.elements);
+    console.log("eye at left",this.eye.elements);
+
+
   }
   panUp(){
     this.at.elements[1] += .10;

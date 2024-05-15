@@ -516,7 +516,8 @@ function main() {
             //console.log("fc",floatingCubeCoords[x][1],float/20,(floatingCubeCoords[x][0]));
             console.log("XY -1<x<1",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0]," -1.5<z<2 ",((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
             console.log("gmap delete",g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]], floatingCubeCoords[x][0], floatingCubeCoords[x][1]);
-            g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]]=0;
+            if (g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]]!=0)
+              g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]]=0;
             console.log("gmap after delete",g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]], floatingCubeCoords[x][0], floatingCubeCoords[x][1]);
 
             //gl.clear(gl.COLOR_BUFFER_BIT);   // Clear <canvas>
@@ -578,6 +579,8 @@ function keydown(ev) {
     g_camera.panRight();
   }
 
+  console.log("my eye",g_camera.eye.elements);
+  console.log("my at",g_camera.at.elements);
   renderScene();
 }
 var g_MvpMatrix = new Matrix4(); // Model view projection matrix
