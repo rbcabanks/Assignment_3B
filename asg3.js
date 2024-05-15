@@ -218,7 +218,7 @@ var g_map=[
   [1,1,1,1,0,0,0,0,0,0,0,0,0,0,1],
   [1,2,0,1,0,0,0,0,2,0,0,0,2,0,1],
   [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-  [1,0,1,0,0,0,1,0,1,0,0,0,2,0,1],
+  [1,0,1,0,0,0,1,0,1,0,0,2,0,0,1],
   [1,1,1,1,0,0,1,1,1,1,1,0,0,0,1],
   [1,0,0,1,0,0,1,0,0,0,1,0,0,0,1],
   [1,2,0,0,0,0,0,0,2,0,1,0,2,0,1],
@@ -286,7 +286,7 @@ function drawMap(g_map){
   //console.log(floatingCubes.length);
 }
 function renderScene(){
-
+  gl.clear(gl.COLOR_BUFFER_BIT);
   var startTime=performance.now();
   updateAnimationAngles();
   renderAllShapes();
@@ -329,7 +329,7 @@ function renderScene(){
   drawCubeUV(modelMatrix,uv);
 
 
-  drawMap(g_map)
+  drawMap(g_map);
 
   for(let x=0;x<floatingCubes.length;x++){
 
@@ -340,7 +340,6 @@ function renderScene(){
     translateM=new Matrix4();
     translateM.setTranslate(0,(float/20),0)
     floatingCubes[x].multiply(translateM);
-    //console.log(floatingCubeCoords[x][0]+3,float/20,floatingCubeCoords[x][1]-1.5);
 
     var colors = new Uint8Array(2);
     //colors[0]=;//floatingCubeCoords[x][0];
@@ -349,7 +348,7 @@ function renderScene(){
     colors[0]=floatingCubeCoords[x][0];
     colors[1]=floatingCubeCoords[x][1];
     
-    rgba=[0,0,0,floatingCubeCoords[x][0]];
+    rgba=[0,0,0,1];
     //rgba=[0,0,0,1];
     gl.uniform1i(u_whichTexture,-2);
     drawCube(floatingCubes[x]);
@@ -494,16 +493,11 @@ function main() {
 
     var picked=false;
     //console.log(pixels);
-    if (pixels[2] == 0) {// The mouse in on cube if R(pixels[0]) is 255
+    if (pixels[0] == 0) {// The mouse in on cube if R(pixels[0]) is 255
       picked = true;
     }
   
      if (picked){
-      //console.log("at",g_camera.at.elements[0],g_camera.at.elements[1],g_camera.at.elements[2])
-      //console.log("eye",g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]-2)
-      /*for(var x=0;x<floatingCubes.length;x++){
-        console.log(floatingCubeCoords[x][1]-1,float/20,(floatingCubeCoords[x][0]*-1)-1);
-      }*/
       console.log("eye",g_camera.eye.elements[0],g_camera.eye.elements[1],g_camera.eye.elements[2]-2)
       console.log("at",g_camera.at.elements[0],g_camera.at.elements[1],g_camera.at.elements[2])
 
@@ -511,28 +505,30 @@ function main() {
         //console.log(floatingCubeCoords[x][1]-1,float/20,(floatingCubeCoords[x][0]*-1)-1);
         /*console.log("ff",floatingCubeCoords[x][1]-1,g_camera.at.elements[0]);
         console.log("fe",(floatingCubeCoords[x][0]*-1.)-1,g_camera.at.elements[2]);*/
+        console.log("x",x,"floatingCubeCoords[x][1]-1",(floatingCubeCoords[x][1]-1),"floatingCubeCoords[x][0]*-1)-1",(floatingCubeCoords[x][0]*-1)-1);
 
-        console.log("xy",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0],((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
+        console.log("xy -1<x<1",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0]," -1.5<z<2 ",((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
         if(((((floatingCubeCoords[x][1]-1)-g_camera.at.elements[0])<=1) && (((floatingCubeCoords[x][1]-1)-g_camera.at.elements[0])>=-1.5)) && ((((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]>=-1.5) && (((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]<=2)))
           {
-            console.log("xx",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0],((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
+            //console.log("xx",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0],((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
 
-            console.log(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0];
-            console.log("fc",floatingCubeCoords[x][1],float/20,(floatingCubeCoords[x][0]));
+            //console.log(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0];
+            //console.log("fc",floatingCubeCoords[x][1],float/20,(floatingCubeCoords[x][0]));
+            console.log("XY -1<x<1",(floatingCubeCoords[x][1]-1)-g_camera.at.elements[0]," -1.5<z<2 ",((floatingCubeCoords[x][0]*-1)-1)-g_camera.at.elements[2]);
+            console.log("gmap delete",g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]], floatingCubeCoords[x][0], floatingCubeCoords[x][1]);
             g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]]=0;
-            totalPoints=totalPoints+1;
-            console.log(totalPoints);
+            console.log("gmap after delete",g_map[floatingCubeCoords[x][0]][floatingCubeCoords[x][1]], floatingCubeCoords[x][0], floatingCubeCoords[x][1]);
+
+            //gl.clear(gl.COLOR_BUFFER_BIT);   // Clear <canvas>
+            renderScene();
 
             if(totalPoints!=10){
+              totalPoints=totalPoints+1;
               sendTextToHTML(totalPoints, "points")}
               else{
               sendTextToHTML("You Win!", "points")
             }
 
-          }
-        if(((floatingCubeCoords[x][1]-1)==g_camera.eye.elements[0]) && (((floatingCubeCoords[x][0]*-1)-1)==g_camera.eye.elements[2]))
-          {
-            console.log("feye",floatingCubeCoords[x][1]-1,float/20,(floatingCubeCoords[x][0]*-1)-1);
           }
         }
       }
@@ -582,27 +578,6 @@ function keydown(ev) {
     g_camera.panRight();
   }
 
-
-/*
-  if(e.button == 2) {
-    // Right click = place block
-    setBlock(blockPos[0], blockPos[1], blockPos[2], TEXTURES.TEXTURE2);
-  } else if(e.button == 0) {
-    // Left click = remove block
-    removeJerry(blockPos[0], blockPos[1], blockPos[2]);
-  }*/
-  
-  /*if(ev.keyCode==67) { // left click
-    /*this.chunk.deleteBlock(cx, cy, cz);
-    this.chunk.deleteBlock(cx + cx_offset, cy, cz + cz_offset);
-    this.chunk.deleteBlock(cx + cx_offset, cy-1, cz + cz_offset);  */
-    //drawCube(cx + cx_offset, cy, cz + cz_offset, 2);  
-    //removeJerry(blockPos[0], blockPos[1], blockPos[2]);
-   /*console.log(JerPos[0],JerPos[1],JerPos[2]);
-  }*/
-  //initTextures(gl,0);
-  //renderAllShapes()
-
   renderScene();
 }
 var g_MvpMatrix = new Matrix4(); // Model view projection matrix
@@ -638,9 +613,12 @@ function initEventHandlers(ev) {
 
 }
 
+const sleepNow = (delay) => new Promise ((resolve) => setTimeout(resolve,delay));
+
 function tick(){
-  g_seconds=performance.now()/20-g_startTime;
+  g_seconds=performance.now()/200-g_startTime;
   updateAnimationAngles();
   renderScene();
+  sleepNow (1000);
   requestAnimationFrame(tick);
 }

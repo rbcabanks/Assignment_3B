@@ -75,8 +75,8 @@ class Camera {
     this.eye.add(b);
     this.setLook();
 
-    moveX=moveX+1;
-    console.log(moveX);
+    //moveX=moveX+1;
+    //console.log(moveX);
 
     /*var w = new Vector3(0.0,0.0,0.0);
     w.set(this.eye);
